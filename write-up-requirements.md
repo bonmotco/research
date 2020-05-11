@@ -38,8 +38,7 @@ __Texteditor__ https://www.slatejs.org/examples/richtext
 - cryptography==2.7     # includes both high level recipes and low level interfaces to common cryptographic algorithms such as symmetric ciphers, message digests, and key derivation functions
 - daphne==2.3.0         # Daphne is a HTTP, HTTP2 and WebSocket protocol server for ASGI and ASGI-HTTP, developed to power Django Channels.   
 - flower==0.9.3         # Flower is a web based tool for monitoring and administrating Celery clusters.
-
-- hiredis==1.0.0          # Python extension that wraps protocol parsing code in -hiredis. It primarily speeds up parsing of multi bulk replies.
+- hiredis==1.0.0 # Python extension that wraps protocol parsing code in -hiredis. It primarily speeds up parsing of multi bulk replies.
 hyperlink==19.0.0 # The humble, but powerful, URL runs everything around us. Chances are you’ve used several just to read this text. Hyperlink is a featureful, pure-Python implementation of the URL, with an emphasis on correctness. BSD licensed.
 - idna-ssl==1.1.0 # Patch ssl.match_hostname for Unicode(idna) domains support
 - immutables==0.9 # An immutable mapping type for Python.
@@ -54,8 +53,7 @@ hyperlink==19.0.0 # The humble, but powerful, URL runs everything around us. Cha
 - PyYAML==5.1.2 # YAML is a data serialization format designed for human readability and interaction with scripting languages. PyYAML is a YAML parser and emitter for Python.
 - redis==3.3.8  # The Python interface to the Redis key-value store.
 - sentry-asgi==0.2.0 # Sentry integration for ASGI frameworks.
-- sentry-sdk==0.12.2 # Sentry provides self-hosted and cloud-based error monitoring that helps all software
-teams discover, triage, and prioritize errors in real-time.
+- sentry-sdk==0.12.2 # Sentry provides self-hosted and cloud-based error monitoring that helps all software teams discover, triage, and prioritize errors in real-time.
 - twisted==19.7.0 # Twisted is an event-based framework for internet applications, supporting Python 2.7 and Python 3.5+. It includes modules for many different purposes, including the following
 - txaio==18.8.1 # txaio is a helper library for writing code that runs unmodified on both Twisted and asyncio / Trollius.
 - typing-extensions==3.7.4 # Typing Extensions – Backported and Experimental Type Hints for Python
@@ -95,7 +93,7 @@ teams discover, triage, and prioritize errors in real-time.
 - flake8==3.7.8  # the modular source code checker: pep8, pyflakes and co
 - ipdb==0.12.2  # exports functions to access the IPython debugger, which features tab completion, syntax highlighting, better tracebacks, better introspection with the same interface as the pdb module.
 - mypy==0.720  # Optional static typing for Python
-- psycopg2==2.8.3 --no-binary psycopg2  # psycopg2 - Python-PostgreSQL Database Adapter
+- psycopg2==2.8.3 # psycopg2 - Python-PostgreSQL Database Adapter
 - pylint-celery==0.3  # pylint-celery is a Pylint plugin to aid Pylint in recognising and understandingerrors caused when using the Celery library
 - pylint-django==2.0.11  # A Pylint plugin to help Pylint understand the Django web framework
 - pytest==5.1.3  # pytest: simple powerful testing with Python
