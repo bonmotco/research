@@ -14,7 +14,7 @@ __Redis__ is an open source (BSD licensed), in-memory data structure store, used
 ## Overview
 So far I cannot classify these imports because I do not know them
 
-- argon2-cffi==19.1.0   # password hasher
+- argon2-cffi==19.1.0   >>> password hasher
 - asgiref==3.2.1        # ASGI is a standard for Python asynchronous web apps and servers to communicate with each other, and positioned as an asynchronous successor to WSGI
 - asn1crypto==0.24.0    # A fast, pure Python library for parsing and serializing ASN.1 structures.
 - async-timeout==3.0.1  # asyncio-compatible timeout context manager.
