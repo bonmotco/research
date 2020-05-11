@@ -1,19 +1,28 @@
-# Overview of base requirements for Writeup.ai
+# Overview of Writeup.ai for me
 
 # General Tools
 
 __Redis__ is an open source (BSD licensed), in-memory data structure store, used as a database, cache and message broker. It supports data structures such as strings, hashes, lists, sets, sorted sets with range queries, bitmaps, hyperloglogs, geospatial indexes with radius queries and streams. 
 
+__Django REST framework__ Django REST framework is a powerful and flexible toolkit for building Web APIs.
 
+__Google Startup Scripts__ Create and run your own startup scripts on your virtual machines (VMs) to perform automated tasks every time your instance boots up. Startup scripts can perform many actions, such as installing software, performing updates, turning on services, and any other tasks defined in the script. You can use startup scripts to easily and programmatically customize your VM instances, including on new instances at creation time.
+
+__Ansible__ is a universal language, unraveling the mystery of how work gets done. Turn tough tasks into repeatable playbooks. Roll out enterprise-wide protocols with the push of a button.
+
+__Cookiecutter Django__ is a framework for jumpstarting production-ready Django projects quickly.
+
+__Texteditor__ https://www.slatejs.org/examples/richtext
+
+
+# Base Requirements
 
 ## Asnyc tools
-- aiocontextvars==0.2.2
-- aiohttp==3.5.4
-- aioredis==1.2.0
+- aiocontextvars==0.2.2 # Asyncio support for PEP-567 contextvars backport.
+- aiohttp==3.5.4 # Async http client/server framework (asyncio)
+- aioredis==1.2.0 # asyncio (PEP 3156) Redis support
 
-## Overview
-So far I cannot classify these imports because I do not know them
-
+## General Requirements
 - argon2-cffi==19.1.0   # password hasher
 - asgiref==3.2.1        # ASGI is a standard for Python asynchronous web apps and servers to communicate with each other, and positioned as an asynchronous successor to WSGI
 - asn1crypto==0.24.0    # A fast, pure Python library for parsing and serializing ASN.1 structures.
@@ -57,20 +66,47 @@ teams discover, triage, and prioritize errors in real-time.
 - yarl==1.3.0 # URL library
 - zope.interface==4.6.0 # This package provides an implementation of “object interfaces” for Python. Interfaces are a mechanism for labeling objects as conforming to a given API or contract. So, this package can be considered as implementation of the Design By Contract methodology support in Python.
 
-## Django Classes
+## Django Requirements
 
-- django==2.2.5 # https://www.djangoproject.com/
-- django-allauth==0.39.1 # https://github.com/pennersr/django-allauth
-- django-cors-headers==3.1.0 # 
-- django-crispy-forms==1.7.2 # https://github.com/django-crispy-forms/django-crispy-forms
-- django-environ==0.4.5 # https://github.com/joke2k/django-environ
-- django-fsm==2.6.1 # 
-- django-model-utils==3.2.0 # https://github.com/jazzband/django-model-utils
-- django-redis==4.10.0 # https://github.com/niwinz/django-redis
-- django-rest-auth==0.9.5 # 
-- djangorestframework==3.10.3 # https://github.com/encode/django-rest-framework
+- django==2.2.5 # A high-level Python Web framework that encourages rapid development and clean, pragmatic design.
+- django-allauth==0.39.1 # Integrated set of Django applications addressing authentication, registration, account management as well as 3rd party (social) account authentication.
+- django-cors-headers==3.1.0 # django-cors-headers is a Django application for handling the server headers required for Cross-Origin Resource Sharing (CORS).
+- django-crispy-forms==1.7.2 # The best way to have Django DRY forms. Build programmatic reusable layouts out of components, having full control of the rendered HTML without writing HTML in templates. 
+- django-environ==0.4.5 # Django-environ allows you to utilize 12factor inspired environment variables to configure your Django application.
+- django-fsm==2.6.1 # Django friendly finite state machine support.
+- django-model-utils==3.2.0 # Django model mixins and utilities
+- django-redis==4.10.0 # Full featured redis cache backend for Django.
+- django-rest-auth==0.9.5 # Create a set of REST API endpoints for Authentication and Registration
+- djangorestframework==3.10.3 # Web APIs for Django, made easy.
 
-## Data Science
+## Data Science Requirements
 - numpy==1.17.2 # NumPy is the fundamental package for array computing with Python.
 - pandas==0.25.1 # Powerful data structures for data analysis, time series, and statistics
 - Pillow==6.1.0  # Python Imaging Library (Fork)
+
+# Local Requirements
+- black==19.3b0  # The uncompromising code formatter.
+- coverage==4.5.4  # Code coverage measurement for Python
+- django-coverage-plugin==1.6.0  # Django template coverage.py plugin
+- django-debug-toolbar==2.0  # A configurable set of panels that display various debug information about the current request/response.
+- django-extensions==2.2.1  # Extensions for Django like validate_template
+- django-test-plus==1.3.1 # django-test-plus provides useful additions to Django's default TestCase
+- factory-boy==2.12.0  # A versatile test fixtures replacement based on thoughtbot's factory_bot for Ruby.
+- flake8==3.7.8  # the modular source code checker: pep8, pyflakes and co
+- ipdb==0.12.2  # exports functions to access the IPython debugger, which features tab completion, syntax highlighting, better tracebacks, better introspection with the same interface as the pdb module.
+- mypy==0.720  # Optional static typing for Python
+- psycopg2==2.8.3 --no-binary psycopg2  # psycopg2 - Python-PostgreSQL Database Adapter
+- pylint-celery==0.3  # pylint-celery is a Pylint plugin to aid Pylint in recognising and understandingerrors caused when using the Celery library
+- pylint-django==2.0.11  # A Pylint plugin to help Pylint understand the Django web framework
+- pytest==5.1.3  # pytest: simple powerful testing with Python
+- pytest-django==3.5.1  # A Django plugin for pytest.
+- pytest-sugar==0.9.2  # pytest-sugar is a plugin for pytest that changes the default look and feel of pytest (e.g. progressbar, show tests that fail instantly).
+- Sphinx==2.2.0  # Python documentation generator
+- Werkzeug==0.15.5  # Werkzeug is a comprehensive WSGI web application library. It began as a simple collection of various utilities for WSGI applications and has become one of the most advanced WSGI utility libraries.
+
+# Production Requirements
+
+- Collectfast==1.0.0  # Efficiently decide what files to upload using cached checksums, parallel file uploads
+- django-anymail[mailgun]==6.1.0  # Sync mailboxes using a distributed task queue
+- django-storages[google]==1.7.1  # Support for many storage backends in Django
+- gunicorn==19.9.0  # Gunicorn ‘Green Unicorn’ is a Python WSGI HTTP Server for UNIX. It’s a pre-fork worker model ported from Ruby’s Unicorn project. The Gunicorn server is broadly compatible with various web frameworks, simply implemented, light on server resource usage, and fairly speedy.
