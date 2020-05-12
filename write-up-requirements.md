@@ -42,6 +42,8 @@ __Texteditor__ https://www.slatejs.org/examples/richtext
 hyperlink==19.0.0 # The humble, but powerful, URL runs everything around us. Chances are you’ve used several just to read this text. Hyperlink is a featureful, pure-Python implementation of the URL, with an emphasis on correctness. BSD licensed.
 - idna-ssl==1.1.0 # Patch ssl.match_hostname for Unicode(idna) domains support
 - immutables==0.9 # An immutable mapping type for Python.
+---
+---
 - incremental==17.5.0 # Incremental is a small library that versions your Python projects.
 - msgpack==0.6.1 # MessagePack is an efficient binary serialization format. It lets you exchange data among multiple languages like JSON. But it's faster and smaller. T
 - multidict==4.5.2 # Multidict is dict-like collection of key-value pairs where key might be occurred more than once in the container.
