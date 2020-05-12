@@ -14,6 +14,7 @@ __Cookiecutter Django__ is a framework for jumpstarting production-ready Django 
 
 __Texteditor__ https://www.slatejs.org/examples/richtext
 
+__Cadd__ Caddy a modern web server supporting HTTP/2 is a quick synopsis on installing Caddy along with a short example configuration file.
 
 # Base Requirements
 
