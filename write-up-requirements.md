@@ -14,6 +14,8 @@ __Ansible__ is a universal language, unraveling the mystery of how work gets don
 
 __Cookiecutter Django__ is a framework for jumpstarting production-ready Django projects quickly.
 
+__Traefik__ Simplify networking complexity while designing, deploying, and running applications. [https://containo.us/traefik/]
+
 __Texteditor__ https://www.slatejs.org/examples/richtext
 
 __Cadd__ Caddy a modern web server supporting HTTP/2 is a quick synopsis on installing Caddy along with a short example configuration file.
@@ -42,7 +44,7 @@ __Cadd__ Caddy a modern web server supporting HTTP/2 is a quick synopsis on inst
 - daphne==2.3.0         # Daphne is a HTTP, HTTP2 and WebSocket protocol server for ASGI and ASGI-HTTP, developed to power Django Channels.   
 - flower==0.9.3         # Flower is a web based tool for monitoring and administrating Celery clusters.
 - hiredis==1.0.0 # Python extension that wraps protocol parsing code in -hiredis. It primarily speeds up parsing of multi bulk replies.
-hyperlink==19.0.0 # The humble, but powerful, URL runs everything around us. Chances are you’ve used several just to read this text. Hyperlink is a featureful, pure-Python implementation of the URL, with an emphasis on correctness. BSD licensed.
+hyperlink==19.0.0 # The humble, but powerful, URL runs everything around us. Chances are you’ve used several just to read this text. Hyperlink is a featureful, pure-Python implementation of the URL, with an emphasis on correctness. 
 - idna-ssl==1.1.0 # Patch ssl.match_hostname for Unicode(idna) domains support
 - immutables==0.9 # An immutable mapping type for Python.
 ---
@@ -74,7 +76,7 @@ hyperlink==19.0.0 # The humble, but powerful, URL runs everything around us. Cha
 - django==2.2.5 # A high-level Python Web framework that encourages rapid development and clean, pragmatic design.
 - django-allauth==0.39.1 # Integrated set of Django applications addressing authentication, registration, account management as well as 3rd party (social) account authentication.
 - django-cors-headers==3.1.0 # django-cors-headers is a Django application for handling the server headers required for Cross-Origin Resource Sharing (CORS).
-- django-crispy-forms==1.7.2 # The best way to have Django DRY forms. Build programmatic reusable layouts out of components, having full control of the rendered HTML without writing HTML in templates. 
+- django-crispy-forms==1.7.2 # The best way to have Django DRY forms. Build programmatic reusable layouts out of components, having full control of the rendered without writing HTML in templates. 
 - django-environ==0.4.5 # Django-environ allows you to utilize 12factor inspired environment variables to configure your Django application.
 - django-fsm==2.6.1 # Django friendly finite state machine support.
 - django-model-utils==3.2.0 # Django model mixins and utilities
