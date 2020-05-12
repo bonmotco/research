@@ -4,6 +4,8 @@
 
 __Redis__ is an open source (BSD licensed), in-memory data structure store, used as a database, cache and message broker. It supports data structures such as strings, hashes, lists, sets, sorted sets with range queries, bitmaps, hyperloglogs, geospatial indexes with radius queries and streams. 
 
+__CircleCI__ CI that’s built for the cloud. Make the switch from Jenkins. [https://circleci.com/]
+
 __Django REST framework__ Django REST framework is a powerful and flexible toolkit for building Web APIs.
 
 __Google Startup Scripts__ Create and run your own startup scripts on your virtual machines (VMs) to perform automated tasks every time your instance boots up. Startup scripts can perform many actions, such as installing software, performing updates, turning on services, and any other tasks defined in the script. You can use startup scripts to easily and programmatically customize your VM instances, including on new instances at creation time.
