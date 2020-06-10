@@ -8,6 +8,7 @@ Overview over the books I read to get a more profound understanding of the techn
 - Do the hello world example of book 2: Websockets
 - Read on there.
 
+---
 
 # Book 1: Jorge Acetozi - Pro Java Clustering and Scalability
 
@@ -36,6 +37,8 @@ Redis can be clustered19 both for replication and for sharding, and its distribu
 - Polling: How could UserB get this message transparently (I mean, without having to refresh the whole chat room page)? It’s easy—just make UserB send HTTP requests using Ajax every three seconds to the server to check whether there are messages for that user. If there are messages, then the server appends them to the HTTP response. This is a polling strategy. Not smart because it needs a hand-shake everytime.
 - That is where WebSocket can help you. It allows you to open a full-duplex bidirectional TCP connection where both sides (the client and the server) can send frames. These frames are different than HTTP requests. Actually, after a WebSocket connection is opened, all traffic between the client and the server occurs through it, so no HTTP requests are sent anymore. Figure 9-1 shows what a frame looks like.
  
+--- 
+
 # Book 2: 2015-Andrew Lombardi WebSocket LIGHTWEIGHT CLIENT-SERVER COMMUNICATIONS
 
 ## Useful Insights
@@ -63,3 +66,8 @@ Introduces STOMP, an acronym for Simple Text Oriented Messaging Protocol, is a s
 2. npm install node, uuid.
 3. node server.js (maybe change the port from 8181 to something else if you restart it).
 4. Open Chrome; navigate to folder and run client.html.
+
+---
+
+# Book 2: 2015-Andrew Lombardi WebSocket LIGHTWEIGHT CLIENT-SERVER COMMUNICATIONS
+
