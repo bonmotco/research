@@ -34,7 +34,7 @@ class Pizza(models.Model):
 - exposing data through Django's views. They are essentially endpoints that you can utilize to return various types of data to your customers, including the HTML pages in their browsers
 
 ---
-Continue here and do the excercise.
+Continue here and do the exercise.
 ---
 
 ## Chapter 3 - Anatomy of a MS
