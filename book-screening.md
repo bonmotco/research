@@ -38,12 +38,22 @@ Redis can be clustered19 both for replication and for sharding, and its distribu
  
 # Book 2: 2015-Andrew Lombardi WebSocket LIGHTWEIGHT CLIENT-SERVER COMMUNICATIONS
 
-## Opinion
-- Chapter 1
-- Work on Chapter 2, 3
-
 ## Useful Insights
+
+### Chapter 1
 - Existing hacks that run over HTTP (like long polling) send requests at intervals, regardless of whether messages are available, without any knowledge of the state of the server or client. The WebSocket API, however, is different—the server and client have an open connection from which they can send messages back and forth. For the security minded, WebSocket also operates over Transport Layer Security (TLS) or Secure Sockets Layer (SSL) and is the preferred method,
-- 
-- 
-- 
+In previous chapters you built simple applications using the WebSocket API both on the server side and on the client. You built a multiclient chat application with Web‐ Socket as the communication layer. 
+
+### Chapter 2 
+...briefly discussed using subprotocols with WebSocket. Now you’ll take everything learned thus far and layer another proto‐ col on top of WebSocket.
+
+### 
+
+### Chapter 4
+Introduces STOMP, an acronym for Simple Text Oriented Messaging Protocol, is a simple HTTP-like protocol for interacting with any STOMP message broker. Any STOMP client can interact with the message broker and be interoperable among languages and platforms.
+
+## Running the Websocket server
+1. Navigate to folder cd/sebastian/websockets/ch3/.
+2. npm install node, uuid.
+3. node server.js (maybe change the port from 8181 to something else if you restart it).
+4. Open Chrome; navigate to folder and run client.html.
