@@ -33,18 +33,20 @@ class Pizza(models.Model):
 4. Communication with Views
 - exposing data through Django's views. They are essentially endpoints that you can utilize to return various types of data to your customers, including the HTML pages in their browsers
 
----
-Continue here and do the exercise.
----
-
 ## Chapter 3 - Anatomy of a MS
 
-- Backend Services
-- Design Principles
+- Backend Services: Talks a lot about data structures, and user data availability for different services. Not a very deep chapter.
+- Design Principles: SOLID
+  1. Single responsibility principle: one single reason to change.
+  2. open-close principle: open to extension but closed to modification
+  3. Liskov substitution principle: if you have subtypes in your program the instances of the said types should be replaceable by the subtypes without breaking your program
+  4. Interface segregation principle: many client interfaces are btter than a few big abstract ones
+  5. Dependency inversion principle: System should depend on abstractions, not concretions.
 
 ## Chapter 4 - Communication
 
-- Rest and Synchronous world
+- Rest and Synchronous world: REpresentational State Transfer
+- The Django REST Framework
 - Asynchronous world - RabbitMQ <<<
 
 
