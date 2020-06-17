@@ -1,5 +1,10 @@
 # Book 3: 2019-Designing Microservices with Django.epub
 
+## Resume
+
+Book is okay and gives an overview but I did not really learn to many things and the projects are not nicely done. Maybe try another one with more code samples and annotations.
+
+
 ## Chapter 1 - What are Microservices?
 
 - Understanding the Microservice
