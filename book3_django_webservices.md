@@ -45,14 +45,29 @@ class Pizza(models.Model):
 
 ## Chapter 4 - Communication
 
-- Rest and Synchronous world: REpresentational State Transfer
-- The Django REST Framework
-- Asynchronous world - RabbitMQ <<<
+### Rest and Synchronous world: REpresentational State Transfer
+- The Django REST Framework. It has to be registered in the settings.py as an application.
+```python3
+pip3 install djangorestframework
+```
+- __Serializer__ to translate into Json
+- __View sets__ describes what type of query should run when we try to access the resource itself
+- __Routers__ map RESTful resources to standardized set of URLs.
 
+### Asynchronous world - RabbitMQ <<<
+- Producers: part of RabbitMQ that are going to assemble and publish the messages we would like to have consumed asynchronously
+- Exchange: logical separator of your message types. E.g., users to users, and likes to likes. Not used widely.
+- Routing key: make sure the right message goes to the right place.
+- Consumers: systems that are interested in this message can create a queue and bind it to the exchange with the given routing key.
+
+Async best practices:
+
+- Message payloads: make sure that when the message producer changes the message payload, the consumers don't get confused and run into exceptions.
+- Handling broker outages: when the central queueing component system stops working, there could be a myriad of issues: lost messages, disconnected producers and consumers. Avoid this by proper monitoring and alerting systems over the broker cluster.
 
 ## Chapter 5 - From Monolith to Microservice
  - not relevant
 
- ## Chapter 6 - Scaling Development
+## Chapter 6 - Scaling Development
 
- - at least figure out what scaffolding is
+- Scaffolding: means using a tool like cookiecutter for Django to set the basic framework of a project.
