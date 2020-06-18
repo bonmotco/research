@@ -1,7 +1,4 @@
 # Book 3: 2019-Designing Microservices with Django.epub
-
-## Resume
-
 Book is okay and gives an overview but I did not really learn to many things and the projects are not nicely done. Maybe try another one with more code samples and annotations.
 
 
@@ -76,3 +73,16 @@ Async best practices:
 ## Chapter 6 - Scaling Development
 
 - Scaffolding: means using a tool like cookiecutter for Django to set the basic framework of a project.
+
+
+# 2018-Building_Django_2.0_Web_Applications 2018
+
+This book has some django projects that are about starting a django web page, connecting it to a database etc.
+I guess it is not of crazy use.
+
+# 2016-Django Project Blueprints
+
+Chapter 1 - Setting up a blog with user accounts
+
+Annotation: Potentially interesting continue with this book.
+Went for more modern books from 2020 because it was from 2016 and about setting up a blog. Come on!
