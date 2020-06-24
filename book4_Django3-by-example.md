@@ -3,14 +3,15 @@
 Last changed on: June 18, 2020
 
 ### Chapter 0: Virtual Environment
-
-- Create the virtual environment: python -m venv my_env
+- cd mysite
+- Create the virtual environment: python3 -m venv my_env
 - You can activate the python environment by running the following command: source my_env/bin/activate
-- Deactivate the virtual environment: deactivate
-
+- pip3 install Django, django-taggit, psycopg2-binary==2.8.4, markdown==3.2.1
+- python manage.py migrate # to sync with database
 - Django (That port is already in use.) remedy: python3 manage.py runserver 800x
 
 - Create a superuser: python manage.py createsuperuser
+- Deactivate the virtual environment: deactivate
 
 ### Chapter 1: Building a Blog Application
 
@@ -71,5 +72,60 @@ Location of files:
 4. Order the result by the number of tags shared with the current post:
 5. Limit the query to the number of posts you want to recommend:
 
-
 ### Chapter 3: Extending Your Blog Application
+
+#### 1. Creating template and tag filters
+
+##### Creating Templates:
+
+Built-in template tags: { if } or { block }
+Custom template tags:
+- simple_tag: processes the data and returns a string
+- inclusion_tag: processes the data and returns a rendered template
+> located inside the blog application directory: templatetags
+
+To Dos:
+- Create a templatetags directory inside your application 'blog'; file name matters
+- register it in the template library with @register.simple_tag
+- load it via { load blog_tags } in the base.html to have it available
+- use it within a div container
+- you can use a @register_inclusion tag e.g. to get Posts ordered by a counter
+- u can also use the annotate function to add an aggregate value to a class like the Post() class. Here count is being used.
+ 
+##### Custom template filters
+
+Basic idea: using Markdown to write blog articles instead of HTML as Markdown is much easier to learn. 
+
+- install the module: pip3 install markdown==3.2.1, and import it in the blog_tags.py file
+- register the template filter the same way the template tag was registered
+- then, load your template tags module in the post list and detail templates; add {% load blog_tags %}; edit the post/list.html to account for the markdown (compare book p. 74)
+- run the server and use markdown
+
+#### 2. Adding a sitemap and post feed
+
+##### Adding a sitemap
+
+- Django has a sitemap framework which creates sitemaps dynamically
+- To install it: activate the *sites* and *sitemap* applications in your project by adding it to the INSTALLED_APP setting in _settings.py_
+- also define a setting for the SITE_ID = 1; run python manage.py migrate
+- Next create a sitemaps.py in the blog application 
+- finally add the sitemap URL by editting the main urls.py file
+- test it by running: http://127.0.0.1:8000/sitemap
+
+##### Adding a post feed
+
+- The bult-in syndication feed framework is introduced
+- create a new file in the blog application named feeds.py
+
+#### 3. Implementing full-text search with PostgreSQL
+
+- search tasks are performed through the Django ORM like contains or its case-insensitive version 'icontains'.
+- Django provides powerful search functonality built on top of PostgreSQL's full-text search features. Therefore, PostgreSQL needs to be installed.
+- Install Postegre by downloading it
+- This throws the good old pyscogr errors... damn shizzle. 
+- Searching against multiple fields is complicated and using a search view for different fields is recommended.
+-after the SearchForm is created, a template to display the form and the results is needed. Create a new file inside the blog/post/template directory, name it search.html and the code 
+- Stemming and ranking results is explained, so is trigram search (which looks into related terms) 
+- onstead of PostGreSQL, Haystack can be used to integrate ElasticSearch or Solr. Haystack is a Django applicatio that works as an abstration layer for multiple search engines. 
+
+### Chapter 4: Building a Social Website
