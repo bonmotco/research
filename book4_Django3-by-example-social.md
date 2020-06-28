@@ -9,6 +9,12 @@ python3 -m venv env/bookmarks
 source env/bookmarks/bin/activate
 ```
 
+Setting up an Admin-account:
+
+python3 manage.py createsuperuser
+
+if server is blogged - just type: thisisunsafe anywhere on the site.
+
 Setting up the Django Project:
 ```python
 pip3 install Django
@@ -30,10 +36,12 @@ python3 manage.py migrate
 -> Django auth templates will be defined later
 
 Libraries needed:
-- pip install Pillow==7.0.0
-- pip install social-auth-app-django==3.1.0
-
-
+pip3 install Pillow==7.0.0;
+pip3 install social-auth-app-django==3.1.0;
+pip3 install django-extensions==2.2.5; 
+pip3 install werkzeug==0.16.0; 
+pip3 install pyOpenSSL==19.0.0;
+pip3 install easy-thumbnails==2.7;
 
 ### Chapter 4: Building a Social Website
 
@@ -124,8 +132,52 @@ Resetting password views:
 - created a custom auth backend
 - added social auth via Facebook
 
-
 ### Chapter 5
-#### Introducing the Follow System
-#### Display Shared Images
-#### Activity Stream 
+
+#### Creating an Image Bookmarking Website
+
+##### Build the Image Model
+- Create new application within bookmarks called images via django-admin startapp images & register it in the settings.py file of bookmarks
+- Edit the models.py file of images application and add the class Image: which will be used to store images retrieved from different sites.
+- override the save() method of the Image model to automatically generate the slug field based on the value of the title field. Import the slugify() function and add a save() methode to the Image model 
+
+##### Creating many-2-many relationships
+
+- integrate n2n relationship as multiple users may like an image, and an image can be liked by multiple users 
+- a join table is created, field provdes a manager that allows to retrieve related objects, such as image.users_like.all() or get them from a user object such as user.images_liked.all()
+- migrate the images database to sync the model with the database
+ 
+##### Registering the image model in the administration file
+
+- edit the admin.py file of the images application and register the Image model, then start the development server
+- type 'thisisunsafe' to get access
+
+#### Posting Content from other Websites
+
+- p.153
+- 
+- 
+- 
+- 
+
+##### Cleaning form fields
+##### Overriding the save() method of a ModelForm
+##### Building a bookmarklet with JQuery
+
+#### Creating a Detail View for Images
+#### Adding AJAX actions with JQuery
+
+##### Loading JQuery
+##### Cross-site requests forgery in AJAX requests
+##### Performing AJAX requests with JQuery
+
+#### Creating Custom Decorators for your Views
+#### Adding AJAX pagination to your list views
+
+
+
+
+
+
+
+
