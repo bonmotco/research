@@ -1,6 +1,6 @@
 # 2020-Django 3 by Example
 
-#### Starting the Social Website Project
+### Starting the Social Website Project
 
 Setting up the virtual environment:
 ```python
@@ -141,7 +141,7 @@ Resetting password views:
 - created a custom auth backend
 - added social auth via Facebook
 
-### Chapter 5
+### Chapter 5: Creating an Image Bookmarking Website
 
 #### Creating an Image Bookmarking Website
 
@@ -217,21 +217,93 @@ Note: Got an error.
 #### Adding AJAX actions with JQuery
 
 - AJAX comes from Asynchronous JavaScript and XML and encompasses techniques to make asnyc HTTP requests. It consists of sending and retrieving data from the server asyncly, w/o reloading the whole page. Despite the name XML is not required. It also works with formats like JSON, HTML or plain text.
-- 
-- 
-- 
+- Here we add a link to the image detail page to let users click on it in order to like an image. This will be done with an AJAX call to avsoid reloading the whole page.
+- First, create a view for users to like/unlike images. Edit the views.py file of the images application. There are two decorators: login_required (only for logged in users), and the require_POST that returns a HttpResponseNotAllowed object (405) if the HTTP request is not done via POST. This way, only POST requests will be allowed for this view.
+- two POST parameters are defined:
+    - image_id: The ID of the image object on which the user is performing the action. 
+    - action: The action that the user wants to perform, which you assume to be a string with the value 'like' or 'unlike'.
 
 ##### Loading JQuery
+
+- for adding AJAX functionality include it within the </body> html tag of the base.html.
+- you load the jQuery framework from Google's CDN
+- $(document).ready() is a jQuery function that takes a handler that is executed when the Document Object Model (DOM) hierarchy has been fully constructed. The DOM is created by the browser when a web page is loaded, and it is constructed as a tree of objects. By including your code inside this function, you will make sure that all HTML elements that are going to interact with are loaded in the DOM. Code is only executed if the DOM is ready.
+
 ##### Cross-site requests forgery in AJAX requests
+
+- with CSRF protection active, Django checks for a CSRF token in all POST requests. This is inconvenient for AJAX requests. 
+- Therefore, Django allows to set a custom X-CSRFToken header in the AJAX requests with the value of the CSRF token. To include the token in all requests, you need to:
+    - retrieve the csrf token from the csrftoken cookie, which is set if SCRF protection is active
+    - send the token in the AJAX request using the X-CSRFToken heder
+
 ##### Performing AJAX requests with JQuery
 
+- Edit the images/image/detail.html template of the images application
+- You will send the value of both attributes in the AJAX request to the image_like view. When a user clicks on the like/unlike link, you will perform the following action on the client side.
+- Also add the domready block at the bottom of the images/image/detail.html template it allows to open the image detail page and to see initial likes count and the like button.
+
 #### Creating Custom Decorators for your Views
+
+- Django request object provides an is_ajax() method that checks whether the request is being made with XMLHttpRequest, this value is set in the HTTP_X_REQUESRTED_WITH HTTP header, which is included in AJAX requests by most JavaScript libraries
+- we create a decorator for checking the HTTP_X_REQUESRTED_WITH HTTP in the views. 
+- Decorator is a function that takes another function and extends the behavior of the latter without explicitly modifying it. 
+- since the decorator will be generic, a common Python Package will be created. 
+- In the bookmarks project directory a folder 'common' and an __init__.py and a decorators.py are needed
+- preceding code is the custom ajax_required decorator (defines a wrap function that returns an HTTP_X_REQUESRTED_WITH HTTP object).
+- edit the views.py file of the images application and add the decorator with '@ajax_required' after from common.decorators import ajax_required
 #### Adding AJAX pagination to your list views
 
+- use AJAX to built an infinite scroll functionality which is achieved by loading the next results automatically when the user scrolls to the bottom of the page 
+- therefore, implement an image list view that will handle both standard browser requests and AJAX requests, including pagination: when the user initially loads the image list page, you will display the first page of images, when they scroll to the bottom of the page, you will load the following page of items via AJAX and append it to the bottom of the main page. 
+- Edit the views.py and the urls.py of the images application
+- Mentioned templates need to be created inside the images/image/ template directory which is named list_ajax.html. This will display the list of images
+- it is used to return results for AJAX requests by iterating over oimages and generate a square 300px thumbnail for each image (by using smart cropping)
+- craete a temlate in the same directory named list.html (extends base.html and includes the ajax_list.html) it will hold the JS code for loading additional pages when scrolling to the bottom of the page
+- finally edit the base.html template and add the URL for the images item of the main menu 
+#### Summary
+
+- Models were created with many-to-many relationships
+- How behavior of forms can be modified
+- with jQuery a JavaScript bookmarklet was build
+- easy-thumbnails were created
+- AJAX views with jQuery and AJAX pagination were added
 
 
 
+### Chapter 6: Tracking User Action
 
+Learnings: build a follow system and an activity stream. Work with generic relations, signals, and denormalization,. Learn how to use Redis with Django.
 
+#### Building a Follow System
 
+##### Creating many-to-many relationships with an intermediary ...
+##### Creating list and detail views for user profiles
+##### Building an AJAX view to follow users
 
+#### Building a Generic Activity Stream Application
+
+##### Using the contenttypes framework
+##### Adding generic relations to your models
+##### Avoiding duplicate actions in the activity stream
+##### Adding user actions to the activity stream
+##### Displaying the activity stream
+##### Optimizing QuerySets that involve related objects
+###### Using select_related()
+###### Using prefetch_related()
+##### Creating templates for actions
+
+#### Using Signals for Denormalizing Counts
+
+##### Working with signals
+##### Application configuration classes
+
+#### Using Redis for Storing Item Views
+
+##### Installing Redis
+##### Using Redis with Python
+##### Storing item views in Redis
+##### Storing a ranking in Redis
+##### Next steps with Redis
+
+#### Summary
+#### Summary
