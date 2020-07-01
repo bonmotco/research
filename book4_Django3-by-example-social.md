@@ -17,24 +17,20 @@ pip3 install pyOpenSSL==19.0.0;
 pip3 install easy-thumbnails==2.7;
 pip3 install --upgrade certifi;
 
-### Setting up an Admin-account
-python3 manage.py createsuperuser
-python3 manage.py migrate 
-
-### Server blocked? - just type: 
-thisisunsafe
-
-### Libraries needed:
-
-    
 ### Sync Database with the models 
 python3 manage.py migrate
+
+### Setting up an Admin-account
+python3 manage.py createsuperuser
 
 ### Start the server:
 python3 manage.py runserver_plus --cert-file cert.crt
 
+### Server blocked? - just type: 
+thisisunsafe
+
 ### test the image saving: 
-https://127.0.0.1:8001/images/create/?title=test&url=https://upload.wikimedia.org/wikipedia/commons/8/85/Django_ Reinhardt_and_Duke_Ellington_%28Gottlieb%29.jpg
+https://127.0.0.1:8000/images/create/?title=test&url=https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Georgios_Jakobides_Girl_reading_c1882.jpg/800px-Georgios_Jakobides_Girl_reading_c1882.jpg
 
 
 ### Chapter 4: Building a Social Website
