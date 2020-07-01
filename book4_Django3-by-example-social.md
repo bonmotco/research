@@ -1,48 +1,14 @@
-# 2020-Django 3 by Example
+# 2020-Django 3 by Example - Chapter 4-6
 
 ### Starting the Social Website Project
 
-Setting up the virtual environment:
-```python
+### Setting up the virtual environment
 mkdir env
 python3 -m venv env/bookmarks 
 source env/bookmarks/bin/activate
-```
 
-Start the server:
-
-
-python3 manage.py runserver_plus --cert-file cert.crt
-
-test the image saving: https://127.0.0.1:8001/images/create/?title=test&url=https://upload.wikimedia.org/wikipedia/commons/8/85/Django_ Reinhardt_and_Duke_Ellington_%28Gottlieb%29.jpg
-
-Setting up an Admin-account:
-
-python3 manage.py createsuperuser
-python3 manage.py migrate 
-if server is blogged - just type: thisisunsafe anywhere on the site.
-
-Setting up the Django Project:
-```python
-pip3 install Django
-django-admin startproject bookmarks
-cd bookmarks/
-django-admin startapp account
-```
-
-Register the Account app in the _settings.py_ file:
-```python
-INSTALLED_APPS = [ 'account.apps.AccountConfig', # ...
-]
-```
-Sync Database with the models 
-```python
-python3 manage.py migrate
-```
-
--> Django auth templates will be defined later
-
-Libraries needed:
+### Installing the modules
+pip3 install Django;
 pip3 install Pillow==7.0.0;
 pip3 install social-auth-app-django==3.1.0;
 pip3 install django-extensions==2.2.5; 
@@ -50,6 +16,25 @@ pip3 install werkzeug==0.16.0;
 pip3 install pyOpenSSL==19.0.0;
 pip3 install easy-thumbnails==2.7;
 pip3 install --upgrade certifi;
+
+### Setting up an Admin-account
+python3 manage.py createsuperuser
+python3 manage.py migrate 
+
+### Server blocked? - just type: 
+thisisunsafe
+
+### Libraries needed:
+
+    
+### Sync Database with the models 
+python3 manage.py migrate
+
+### Start the server:
+python3 manage.py runserver_plus --cert-file cert.crt
+
+### test the image saving: 
+https://127.0.0.1:8001/images/create/?title=test&url=https://upload.wikimedia.org/wikipedia/commons/8/85/Django_ Reinhardt_and_Duke_Ellington_%28Gottlieb%29.jpg
 
 
 ### Chapter 4: Building a Social Website
