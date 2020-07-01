@@ -9,10 +9,17 @@ python3 -m venv env/bookmarks
 source env/bookmarks/bin/activate
 ```
 
+Start the server:
+
+
+python3 manage.py runserver_plus --cert-file cert.crt
+
+test the image saving: https://127.0.0.1:8001/images/create/?title=test&url=https://upload.wikimedia.org/wikipedia/commons/8/85/Django_ Reinhardt_and_Duke_Ellington_%28Gottlieb%29.jpg
+
 Setting up an Admin-account:
 
 python3 manage.py createsuperuser
-
+python3 manage.py migrate 
 if server is blogged - just type: thisisunsafe anywhere on the site.
 
 Setting up the Django Project:
@@ -42,6 +49,8 @@ pip3 install django-extensions==2.2.5;
 pip3 install werkzeug==0.16.0; 
 pip3 install pyOpenSSL==19.0.0;
 pip3 install easy-thumbnails==2.7;
+pip3 install --upgrade certifi;
+
 
 ### Chapter 4: Building a Social Website
 
@@ -147,25 +156,70 @@ Resetting password views:
 - a join table is created, field provdes a manager that allows to retrieve related objects, such as image.users_like.all() or get them from a user object such as user.images_liked.all()
 - migrate the images database to sync the model with the database
  
-##### Registering the image model in the administration file
+##### Registering the Image Model in the Administration Site
 
-- edit the admin.py file of the images application and register the Image model, then start the development server
-- type 'thisisunsafe' to get access
+- Edit the admin.py file of the images application and register the Image model, then start the development server.
+- type 'thisisunsafe' to get access.
 
 #### Posting Content from other Websites
 
-- p.153
-- 
-- 
-- 
-- 
+- uers can bookmark images from external sites. User will provide the URL of the image, a title, and a description. The application willl then download the image. 
+- therefore create a new forms.py in images application directory.
 
 ##### Cleaning form fields
+- Check if filename is a JPEG file by including a validation technique. 
+- You also need to download the image file and save it. 
+
 ##### Overriding the save() method of a ModelForm
+
+- override the standard save() method in order to retrieve the given image and save it.
+- procedure: (1) create a new image insatance by calling save() method with commit = false; (2) get the URL from cleaned_data dict; (3) generate the image name by combining the image title slug; (4) urllib to download the image and call save() passing a ContentFile object through which file is saved to the media directory of the project; (5) only save file when the commit parameter is True.
+- for urllib through HTTPS you need Certifi Python pacakge. 
+- build a view for handling the form
+- register the url in urls.py of images and in the main application
+- create a template to render the form create.html and add the following code to it. 
+
+Note: Got an error.
+
 ##### Building a bookmarklet with JQuery
 
+- bookmarklet is a bookmark stored in a web browser that contains JavaScript code to extend the browser's functionality.
+- when you click the bookmark, the JS code is executed on the website being displayed in the browser. 
+- Pinterst implements their own bookmarklets to let users share content from other sites onto their platform. We do this with JQuery.
+- JQuery is a popular JavaScript library that allows to develop client-side functionality faster. 
+- Logic:
+    - user drags link from site to their browsers bookmarks. We will implement a launcher script that allows to update the code of the bookmarklet at any time. 
+    
+- Create a template in images/templates named bookmarklet_launcher.js : it will discover wheter the bookmarklet has already been loaded; if not: you load another JS file bookmarklet.js that allows to update the bookmarklet.
+- add the bookmarklet launcher to the dashboard to copy it to the bookmarks of the user 
+- django does not support mutliple line tags; see the dashboard in browser
+- create static/js/bookmarklet.js and copy the code from the book: jquery script loads from Google content delivery network (CDN) 
+- also copy the css file
+- with the code you can bookmark any image, by attaching a click() event to each image's link element.
+- when a user clicks on an image, you set a new variable called selected_image that contains the URL of the selected image.
+- You hide the boomarklet and open a new browser window with the URL for bookmarking a new image on your site. Pass the content of the <title> element of the website and the selected image URL as 'GET' parameters.
+
 #### Creating a Detail View for Images
+
+- open views.py of the images application and add a simple view to display the image. 
+- edit urls.py file of the images application and add a url parameter
+- edit models.py of images application and at the get_absolute_url() method to the Image model (rmb that the common pattern for providing canonical URLs for objects is to define a get_absolute_url() method in th model)
+- create a template inside /images/image template directory of the images app and name it detail.html 
+ 
+##### Creating Image Thumbnails using easy-thumbnails
+
+- display orig image on the detail page may have to big dimensions. Therefore use easy-thumbnail to fit them. 
+- Register it in settings.py under INSTALLED_APPS
+- run python3 manage.py migrate to sync it with the database
+- edit the detail.html template by including the thumnail image.image 300x0 tag. The width now is fixed with 300px and the height is flexible indicated by 0. 
+- an thumbnail will now be automatically generated and displayed on the site. the 85 indicates 85% quality in storage.
+
 #### Adding AJAX actions with JQuery
+
+- AJAX comes from Asynchronous JavaScript and XML and encompasses techniques to make asnyc HTTP requests. It consists of sending and retrieving data from the server asyncly, w/o reloading the whole page. Despite the name XML is not required. It also works with formats like JSON, HTML or plain text.
+- 
+- 
+- 
 
 ##### Loading JQuery
 ##### Cross-site requests forgery in AJAX requests
