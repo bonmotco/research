@@ -16,9 +16,12 @@ pip3 install werkzeug==0.16.0;
 pip3 install pyOpenSSL==19.0.0;
 pip3 install easy-thumbnails==2.7;
 pip3 install --upgrade certifi;
+pip3 install redis==3.4.1;
+
 
 ### Sync Database with the models 
-python3 manage.py migrate
+python3 manage.py makemigrations account
+python3 manage.py migrate (account)
 
 ### Setting up an Admin-account
 python3 manage.py createsuperuser
@@ -257,34 +260,204 @@ Learnings: build a follow system and an activity stream. Work with generic relat
 
 #### Building a Follow System
 
-##### Creating many-to-many relationships with an intermediary ...
+Users will be able to follow each other and track what other users share on the platform.
+
+##### Creating many-to-many relationships with an intermediary model
+
+- previously we used the Many2Many field. Now we use the intermediary model for two reasons: 
+    - Using the User model provided by Django and avoid altering it
+    - Store time when a relationship was created
+- edit the models.py to add the class Contact(models.Model) with user_from (foreignKey of the user who created the relationship) and user_to (foreignKey) for the user being followed, and created with auto_now_add=True, also a database index is automatically created which improves the query performance
+- edit the models.py of the account application by adding user_model.get_user_model() and user_model.add_to_class('following', models.ManyToManyField('self', through=Contact, related_name='followers', symmetrical=False))
+- by using the intermediary Contact model complex queries will be avoided (otherwise additional db joins). Table for the model via the Contact model
+- non-symmetrical was defined because 'if I follow you, you do not follow me'
+- sync the database with the model
+
 ##### Creating list and detail views for user profiles
+
+- Open the views.py file of the account application and define methods: user_list and user_detail. 
+- edit the urls.py to add a URL pattern for each view: users/ and users/<username>
+- user_detail URL pattern will be used for generating the canonical URL for users 
+- in the settings.py add the ABSOLUTE_URL_OVERRIDES. This method returns the corresponding URL for the given model specified in the setting. Now get_absolute_url() on a User instance can be used to retrieve its corresponding URL
+- next create templates for the viewsL users/detail.html and users/list.html with an easy-template for each user
+- include the user_list URL into the the href attribute of the menu
+- detail.html shows full name, thumbnail, total followers, link to follow/unfollow a user
+
 ##### Building an AJAX view to follow users
+
+- create a view to follow/unfollow a user using AJAX by editing the views.py of the account application
+- user_follows view is quite similar to the image_like view: edit the urls.py 
+- edit the user/detail.html of the accound and add the domready block
 
 #### Building a Generic Activity Stream Application
 
+- activity stream so that users can track what other users do on the platform; for that you need a model to save the actions performed by users on the website and a simple way to add actions to the feed
+- create a new application named actions inside your project with the command 'python3 manage.py startapp actions' and add the appliation in the settings.py
+- edit the models.py file of the action application and add the class ACtion() with user (who performed the action), verb (describing the action the user performed), created (date and time when it was created)
+- this basic model allows only to do __X did something__. For __X bookmarked image Y__ you need a way for the action's target object to be an instance of an existing model which is what Django contenttypes framework does.
+
 ##### Using the contenttypes framework
+
+- included in Django via django.contrib.contenttypes. It can track all models installed in the project and provides a generic interface to interact with the models
+- it is included in the INSTALLED_APPS setting by default when you execute the startproject command as it is used by the auth framework and the admin application
+- contenttypes application contains a ContentType mdoel. Instances of this model represent the actual model of the application, and new instances of ContentType are automatically created when new models arse installed: 
+    - app_label: indicates the name of the application that the model belongs to. IT is automatically taken from the app_label attribute of the model Meta options. 
+    - model: Name of the model class.
+    - name: Indicates the human-readable name of the model taken from the verbose_name attribute of the model Meta options.
+- Interact with ContentType objects by opening the shell using python3 manage.py shell
+
 ##### Adding generic relations to your models
+
+- in generic relations ContentType objects play the role of pointing to the model used for the relationship. Three fields are needed:
+    - target_ct - ForeignKey field to ContentType: this will tell the model for the relationship
+    - target_id - Field to store the pirmary key of the related object as a PositiveIntegerField 
+    - target - GenericForeignKey field to define and manage the generic relation using the two previous fields.
+- edit the models.py fiel of the actions application and import ContentType and GenericForeignKey; edit the class Action(models.Model)
+- create initial migrations: python3 manage.py makemigrations actions
+- then sync the application with the database: python3 manage.py migrate
+- add the ACtion model to the administration site by editing the admin.py file of the actions application (from .models import Action)
+- only the target_ct and the target_id fields are mapped to actual database fields shown
+- create a new field in the action application directory named utils.py. We need it to define a shortcut function that will allow to create new Action objects in a simple way: - therefore adding the create_action() function which allows to create actions that optionally include a target object 
+
 ##### Avoiding duplicate actions in the activity stream
+
+- if users click several times on the LIKE or UNLIKE button or perform the same action multiple times it will lead to storing or displaying duplicate actions. Hence, improve the create_action() function.
+- edit utils.py by adding datatime and checking for similar action within the last minute. Return a bool if action was performed (because it was not the same within the last 60s). 
+
 ##### Adding user actions to the activity stream
+
+- store an action for: a user bookmarks an image/a user likes an image/ a user creates an account/a user starts folllowing another user 
+- edit the views.py of the *images* application and add actions.utils import
+    - in images_create views add create_action() after saving the image
+    - in the image_like view add create_action() after adding the user to the users_like relationship
+- now edit the views.py file of the *account* application and add the fimport
+    - in the register view add create_action() after creating the Profile object
+    - in the user_following view
+- thanks to the Action model and the helper function, it is easy to save new actions to the activity stream
+
 ##### Displaying the activity stream
+
+- edit the views.py of the account application to integrate the activity screen in the dashboard. Import the Action model and modify the dashboard() view
+- display all actions by default excluding those performed by the current user
+- results are limited to 10 actions returned
+
 ##### Optimizing QuerySets that involve related objects
+
+- every time a Action object is retrieved, the related User object will be accessed
+- Django ORM offers a simple way to retrieve related objects at the same time, thereby avoiding additional queries to the database
+
 ###### Using select_related()
+
+- a QuerySet method called select_related() that allows to retrieve related objects for one-to-many relationships translating into single more complex Querysets but additional queries are avoided
+- select_related method is for ForeginKey and OneToOne fields. It works by performing a SQL JOIN and including the fields of the related object in the SELECT statement
+- add it also to the 'user__profile' to join the Profile table in a single SQL qeuery
+
 ###### Using prefetch_related()
+
+- prior function will help to boost performance for retrieving related objects in one-to-many relationships. However, it does not work for many2many relationships
+- therefore use prefetch_related that performs a separate lookup for each relationship and joins the results using Python
+- method supports the prefetching of GenericRelations and GenericForeignKey
+- edit the views.py file of the account application and add the prefetch 
+
 ##### Creating templates for actions
+
+- Now create a template to display a particular Action object. Create templates/actions/action.detail.html in action directory and edit it
+- first retrieve the user performing the action and the related Profile object
+- then, display the image of the target object if the Action object has a related target object. 
+- Display the link to the user who performed the action, the verb, and the target object.
+- Edit the account/dashboard.html template of the account application and append the code.
 
 #### Using Signals for Denormalizing Counts
 
+- Denormalizing is making data redundant in such a way that it optimizes read performance. E.g., you might be copying related data to an object to avoid expensive read queries to the database when retrieving the related data. 
+- Biggest issue is keeping denormalized data updated.
+
 ##### Working with signals
+
+- Django comes with a signal dispatcher that allows receiver functions to get notified when certain actions occur. Signals are very useful when you need your code to do something every time something else happens. 
+- Signals allow to decouple logic: capture a certain action, and implement logic that gets executed whenver that action occurs. E.g., build a signal receiver function that gets executed every time a User object is saved. Django provides multiple signals at django.db.models.signals: 
+    - pre_save and post_save sent before or after calling the save() method of a model
+    - pre_delete and post_delete are sent before or after calling the delete() method
+    - m2m_changed when a many2manyfield on a model is changed (and many more)
+- Retrieve images by popularity. Use the Django aggreation functions to retrieve images ordered by the number of users who like them. However, ordering images by counting their total likes is more expensive than ordering them by a field that sores total counts. 
+- You can add a field to the Image model to denormalize the total number of likes to boost performance in queries that involve this field. But you need to keep it updated.
+
+    - Edit the models.py file of the images application and add the total_likes filed to the Image model: it will allow to store the total count of users who like each imagel
+    - Create migrations for adding the new field to the database 'makemigration' and apply it 'migrate'
+    - Attach a receiver function to the m2m_changed signal by creating a signals.py in the images application directory
+        - register the users_like_changed function as a receiver function using the receiver() decorator; attach it to the m2m_changed signal
+        - connect the function to Iamge.users_like.through so that the function is only calld if the m2m_changed singal has been lauched by this sender
+- Django signals are synchronous and blocking. Do not confuse them with async tasks. However, you can combine them both to launch async tasks when your code gets notified by a signal with Celery (Chapter 7).
+- connect the receiver function to a signal so taht it gets called every time the signal is sent. The recommended method for registering your signals is by importing them in the ready() method of your application config class.
 ##### Application configuration classes
 
+- Django allows you to specify application classes for your applications. When you create an application using the startapp command, DJango adds an apps.py file to the application directory, including a basic application configuration that inherits from the AppConfig class.
+- The application configuration class allows you to store metadata and the configuration for the application, and it provides introspection for the application.
+- To register the signal receiver functions, when you use the receiver() decorator, you just need to import the signals module of your application inside the ready() method of the application configuration class
+- This method is called as soon as the application registry is fully populated. Any other initializations for your application should also be included in this method.
+- Edit the apps.py file of the images application and add a def ready(self) that imports images.signals 
+- Open the browser to view an image detail page and click on the LIKE button. In the admin site, take a look at the total_likes attribute. You should see the total_likes attribute updated with the total number of users who like the image.
+- The SQL query is now less expensive. This is just an example of how to use Django signals. 
+- However, you will need to set intial counts for the rest of the Image objects to match the current status of the database. Open the shell with the python3 manage.py shell and run an update code.
+ 
 #### Using Redis for Storing Item Views
 
+- Redis is an advanced key/value database that allows to save different types of data. 
+- It has extremely fast I/O operations. Redis stores everything in memory, but the data can be persisted by dumping the dataset to disk every once in a while, or by adding each command to a log. 
+- Redis is very versatile compared to other key/values stores: it provides a set of powerful commands and supports diverse data structures
+
 ##### Installing Redis
+
+- Download Redis from redis.io/download, unzip it. 
+- Enter the redis directory, and compile Redis using the `make` command
+- After installing redis start the Redis server by: `src/redis-server`
+- Open a new shell and start the Redis client with `src/redis-cli` 
+- Now you can execute Redis commands directly from the shell: `SET name "Peter"` creates a name key with the string value "Peter" in the Redis database. OK output confirms the success. 
+- Retrieve the value using `GET name`
+- Check whether a key exists: `EXISTS name`
+- Set the time for a key to expire which allows to set time-to-live in seconds. Another option is using the EXPIREAT command that expects a Unix timestamp: `EXPIRE name 2` (two seconds for the name to be deleted - returns `(nil)`)
+- You can also delete any key using the `DEL name` command (set it before :smile:). 
+
 ##### Using Redis with Python
+
+- install Python bindings for Redis install redis-py via `pip3 install redis==3.4.1`. It interacts with Redis, providing a Python interface 
+- Create a connection with the database through python via `r = redis.Redis(host='localhost', port=6379, db=0)`
+- Databases are identified by an integer index instead of a database name. By default, a client is connected to the database 0. 
+- Setting a key using the Python shell `r.set('foo', 'bar')` returns True
+- Retrieve the key: `r.get('foo')` returns `b'bar'`.
+- Integrate Redis into the project by editing the settings.py file of the bookmarks project and adding the following setting to it: 
+    - REDIS_HOST = 'localhost'
+    - REDIS_PORT = '6379'
+    - REDIS_DB = '0'
+
 ##### Storing item views in Redis
+
+- Let us find a way to store the total number of times an image has been viewed. With Django ORM, it involves a SQL Update every time an image is displayed. With Redis, you just need to increment a counter stored in memory. 
+- Edit the views.py file of the images application and establish the Redis connection in order to use it in your views. 
+- Edit the views.py file of the images application and modify the image_detail view by adding (amongst others): `total_views = r.incr(...)` which is the redis call
+- Using the incr command that increments the value of a given key by 1. If the key does not exist, the incr command creates it. You store the value in total_views variabel and pass it in the template context. 
+- The convention for Redis keys is to use a colon sign as a separator for creating namespaced keys. By doing so, the key names are especially verbose and related keys share part of the same schema in their names.
+- Edit the images/image/detail.html and add the class count created in the view.py file. Now, the total views of any image will be incremented by 1. 
+
 ##### Storing a ranking in Redis
+
+- Create a ranking of the most viewed images on the platform. For building this ranking, use a Redis sorted sets. A sorted set is a non-repeating collection of strings in which every member is associated with a score. Imtes are sorted by their score. 
+- Edit the views.py file of the images application and adapt the image_detail() function by #increment image ranking by 1 using the zincrby() command to store image views in a sorted set with the image:ranking key. 
+- Store the image id and a related score of 1, which will be added to the total score of this element in the sorted set. This allows to keep track of all image views globally and have a sorted set ordered by the total number of views. 
+- Create a new view to display the ranking of the most viewed images. Add the function def image_ranking(request) view which works as:
+    - zrange() command ontains the elements in the sorted list. It exepcts a custom range according to the lowest and highest score. 0 as lowest, and -1 as highest returns all elements. desc=True returns them by descending order. 
+    - Build a list of returned image IDs and store itin the image_ranking_ids variable as a list of integers. Retrieve the Image objects for those IDs and force the query to be executed using the list() function. 
+- Sort the Image objects by their index of appearance in the image ranking. 
+- Create a new ranking.html template inside the images/image template directory of the images application that extends the base.html.
+- lastly, create a URL pattern for the new view by editing the urls.py file of the images application 
+
 ##### Next steps with Redis
 
+Redis is not a replacement for your SQL database but if does offer fast in-memory sotrage that is more suitable for certain tasks. Scenarios: Counting, Caching, Real-time tracking.
+
 #### Summary
-#### Summary
+
+- built a follow system using many-to-many relationships with an intermediary model. 
+- activity stream with generic relations
+- Django signals and a signal receiver to denormalize related object counts
+- install and configure Redis in Django projects
