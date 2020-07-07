@@ -5,7 +5,7 @@
 ### Setting up the virtual environment
 mkdir env
 python3 -m venv env/myshop 
-source env/bookmarks/bin/activate
+source env/myshop/bin/activate
 
 #### Installing WeasyPrint
 - operating system from https:// weasyprint.readthedocs.io/en/latest/install.html
@@ -21,14 +21,17 @@ pip3 install braintree==3.59.0;
 pip3 install WeasyPrint==51;
 
 ### Sync Database with the models 
-python3 manage.py makemigrations account
-python3 manage.py migrate (account)
+python3 manage.py makemigrations
+python3 manage.py migrate
 
 ### Setting up an Admin-account
 python3 manage.py createsuperuser
 
 ### Start the Server
-python3 manage.py runserver
+Shell 1: brew service start rabbitmq
+Shell 2: source env/myshop/bin/activate; celery -A myshop worker -l info
+Shell 3: source env/myshop/bin/activate; python3 manage.py runserver
+Stop Shell 1: brew service stop rabbitmq
 
 ### Use the STATIC_ROOT setting
 python3 manage.py collectstatic
@@ -36,20 +39,8 @@ python3 manage.py collectstatic
 ### Server blocked? - just type: 
 thisisunsafe
 
-### Install RabbitMQ
-- Find it on www.rabbitmq.com/download.html and run it in shell via `rabbitmq-server`
-
-### Launch Flower by running the command from the project directory: 
-- celery -A myshop flower
-
 ### Testing Payments
-- Open a shell and run RabbitMQ with the command `rabbitmq-server`
-- Open another shell and start the Celery worker with `celery -A myshop worker -l info`
-- Open another shell and start the development server with `python3 manage.py runserver` 
-- Testing credit cards at https:// developers.braintreepayments.com/guides/credit-cards/testing-go-live/python
-
-
-
+Testing credit cards at https:// developers.braintreepayments.com/guides/credit-cards/testing-go-live/python
 
 ## Chapter 7: Building an Online Shop
 
