@@ -7,18 +7,28 @@ mkdir env
 python3 -m venv env/myshop 
 source env/myshop/bin/activate
 
-#### Installing WeasyPrint
+### Installing WeasyPrint
 - operating system from https:// weasyprint.readthedocs.io/en/latest/install.html
 
+### Installing Gettext for Internationalization
+brew install gettext
+brew link --force gettext
+
 ### Installing the modules
-# Chapter 7
+### Chapter 7
 pip3 install Django;
 pip3 install Pillow==7.0.0;
 pip3 install celery==4.4.2;
 pip3 install flower==0.9.3;
-# Chapter 8
+### Chapter 8
 pip3 install braintree==3.59.0;
 pip3 install WeasyPrint==51;
+### Chapter 9
+pip3 install django-rosetta==0.9.3;
+pip3 install django-parler==2.0.1;
+pip3 install django-localflavor==3.0.1; 
+pip3 install redis==3.4.1;
+
 
 ### Sync Database with the models 
 python3 manage.py makemigrations
@@ -33,6 +43,9 @@ Shell 2: source env/myshop/bin/activate; celery -A myshop worker -l info
 Shell 3: source env/myshop/bin/activate; python3 manage.py runserver
 Stop Shell 1: brew service stop rabbitmq
 
+Shell 4: src/redis-server 
+Shell 5: python3 manage.py shell # with min 4 products in the database
+
 ### Use the STATIC_ROOT setting
 python3 manage.py collectstatic
 
@@ -41,6 +54,13 @@ thisisunsafe
 
 ### Testing Payments
 Testing credit cards at https:// developers.braintreepayments.com/guides/credit-cards/testing-go-live/python
+
+### Start the translation
+django-admin makemessages --all
+
+### Translation Editor
+https://poedit.net/
+
 
 ## Chapter 7: Building an Online Shop
 
@@ -478,27 +498,382 @@ BRAINTREE_CONF = braintree.Configuration(
 
 ## Chapter 9: Extending Your Shop
 
-
-
 ### Creating a Coupon System
+
+- Online Coupon: can be redeemed for discounts on purchases
+- Usually consists of a code that is given to users and is valid for a specific time frame
+- Create a coupon system for your shop; no limitation in terms of the number of times it can be redeemed
+- create a new application inside the myshop project `python3 manage.py startapp coupons`, edit the settings.py of `myshop` and add the application to the INSTALLED_APPS
+
 #### Building the Coupon Model
+
+- Edit the `models.py` of the coupons appilcation by adding a Class Coupon(); makemigrations & migrate to sync with the database
+    - code: charField
+    - valid_from: DateTimeField()
+    - valid_to: DateTimeField()
+    - discount: IntegerField(validators=min/max)
+    - active: bool
+- Add a coupon model to the administration site. Edit the `admin.py` file of the coupons application @admin.register(Coupon):
+    - list_display: 
+    - list_filter: 
+    - search_fields: 
+
 #### Applying a Coupon to the Shopping Cart
+
+- Store new coupons and make queries to retrieve existing coupons. Functionality for users: 
+    - User adds products to the shopping cart.
+    - User can enter a coupon code in a form displayed on the shopping cart detail page.
+    - When user enters a coupon code and submits the form, you look for an existing coupon with the given code that is currently valid. You have to check that the coupon code matches the one entered by the user, that the active attribute is `True` and that the current datetime is between the valid_from and valid_to values.
+    - if a coupon is found, save it in the user's session and display the cart, including the discount applied to it and the updated total amount
+    - When the user places an order, you save the coupon to the given order.
+- Create a new file inside the coupons application directory and name it `forms.py`. 
+- Edit the `views.py` file inside the coupon application and add the functions `coupon_apply()` which validates the coupon and stores it in the user's session. 
+    - Instantiate the CouponApplyForm form using the posted data and check that the form is valid
+    - If the form is valid, you get the code entered by the user from the form's cleaned_data dictionary. Try to retrieve the Coupon object with the given code. 
+    - Use an iexact field lookup to perform a case-insensitive exact match. The coupon has to be currently active and valid for the current datetime. Use Django's timezone.now() function to get the current timezone-aware datetime and you compare it with the valid_from and valied_to fields performing lte (less than or equal to) and gte (greater than equal to) field lookups, respectively.
+    - Store the coupon ID in the user's session.
+    - Redirect the user to the cart_detail URL to display the cart with the coupon applied.
+- You need a URL pattern for the coupon_apply view. Create a new file inside the coupons application directory and name it `urls.py`. Then edit the `urls.py` of the myshop project and include the coupons URL; place it before the shop.urls pattern
+- Edit the `cart.py` file in the cart application. Include the Coupon import and add it to the Cart() class
+- In the code, try to get the coupon_id sessions key from the current session and store its value in the Cart object:
+    - coupon(): define this method as a property. If the cart contains a coupon_id attribute, the Coupon object with the given ID is returned.
+    - get_discount(): if the cart contains a coupon, you retrieve its discount rate and return the amount to be deducted from the total amount of the cart.
+    - get_total_price_after_discount(): return the total amount of the car after deducting the amount returned by the get_discount() method
+- Cart class is now prepared to handle a coupon applied to the current session and apply the corresponding discount. Include the coupon system in teh cart's detail view. 
+- Edit the `views.py` file of the cart application and add the import at the top of the file CouponApplyForm and edit the cart_detail view ; also change the detail.html to display an optional coupon and its discount rate. If the cart contains a coupon, display a first row, including the total maount of the cart as the subtotal. Then, you use a second row to display the current coupon applied to the cart. Finally, display the total price, including any discount by calling the get_total_price_after_discount() method of the cart object.
+- Add the coupon to the purchase process by editing orders/order/create.html template of the orders application so that the order summary also contains the coupon applied 
+
 #### Applying Coupons to Orders
 
+- Store the coupon that was applied to each order. First modify the Order model to store the related Coupon object, if there was one by editing `models.py`:
+    - coupon: store an optional coupon for the order 
+    - discount: and the discount percentage applied with the coupon
+- The discount is storedn in the Coupon object but you include it int he Order model to preserve it if the coupon is modified or deleted
+- set on_delete to models.SET_NULL so that if the coupon gets deleted, the coupon filed is set to NULL but the discount is preserved.
+- Create a migration to include the new fields of the Order model. 
+- Return to `models.py` fiel and change the `get_total_cost()` method of the Order model
+- Th get_total_cost() method of the Order model will now take into account the discount applied
+- Edit the `views.py` file of the orders application and modify the order_create view. In the new code you create an Order object using the save() method of the OrderCreateForm form. Avoid saving it to the database yet by using commit=False. If the cart contains a coupon, you store the related coupon and the discount that was applied. Then, you save the order object to the database.
+
 ### Adding Internationalization and Localization
+
+- Django offers full internationalization and localization support. It allows to translate the application into multiple languages and it handels formatting for dates, times, numbers and timezones. 
+- Internationalization (i18n): process of adapting software for the potential use of different languages and locals, so that it isn't hardwired to a specific language or locale 
+- Localizaton (l10n): process of actually translating the software and adapting it to a particular locale. 
+
 #### Internationalization with Django
+
+- allows to easily mark strings for translation both in Python code and in templates. Relies on the GNU gettext toolset to generate and mange message files.
+- Message file is a plain text fiel that represents a language. It contains a part, or all, of the translation strings found in your application and their respective translations for a single language. 
+- Message files have the .po extension. Once the translation is done, message files are compiled to offer rapid access to translated strings.
+- The compiled translation files have the .mo extension.
+
+##### Internationalization and Localization Settings
+
+Settings for internationalization.
+
+- USE_I18N: A bool that specifies whether Django's translation system is enabled. This is `True` by default.
+- USE_L10N: A bool indicating whether localized formatting is enabled. When active, localized formats are used to represent dates and numbers. This is `False` by default.
+- USE_TZ: Bool specifying if datetimes are timezone-aware.
+- LANGUAGE_CODE: default language code for the project.
+- LANGUAGES: A tuple that contains available lanuages for the project. They come in two tuples of a language code and language name. You can see the list of available languages at django.conf.global_settings.
+- LOCALE_PATHS: A list of directories where Django looks for message files containing translations for the project.
+- TIME_ZONE: A string that represents the timezone for the project. Set to 'UTC' when you create a new project using the startproject command.
+
+##### Internationalization Management Commands
+
+- Django includes:
+    - makemessages: runs over the source tree to find all strings marked for translation and creates or updates the .po message files in the locale directory. A single .po file is created for each language.
+    - compilemessages: This compiles the existing .po message files to .mo files that are used to retrieve translations.
+- You need the gettext toolkit to be able to create, update, and compile message files. Install it via homebrew 'brew install gettext'
+- maybe force link it via `brew link --force gettext`.
+
+##### How to add translations to a Django project
+
+- Mark strings for translation in code and templates
+- Run the makemessages command to create or update message files that include all translation strings from your code 
+- Translate the strings contained in the message files and compile them using the complilemessages management command
+
+##### How Django determines the Current Language
+
+- Django has a middleware that determines the current language based on the request data. It is LocaleMiddleware that resides in django. It performs the following tasks:
+    - If you are using the i18n_patterns you are using translated URL patterns, it looks for language prefix in the requested URL to determine the current language.
+    - If no language prefix is found, it looks for an existing LANGUAGE_SESSION_KEY in the current user's session.
+    - If the language is not set in the session, it looks for an existing cookie with the current language. A custom name fo rthsi cookie can be provided in the LANGUAGE_COOKIE_NAME setting. By default, the name for this cookie is django_language.
+    - If no cookie is found, it looks for Accept-Language HTTP hedaer of the request. 
+    - If the Accept-Language header does not specify a language, Django uses the language defined in the LANGUAGE_CODE setting.
+    
+- By default, Django uses the language defined in the LANGUAGE_CODE setting unless you are using LocaleMiddleware. The process described here only applies when using this middleware.
+
 #### Preparing your Project for Internationalization
+
+- Create an English and Spanish version for the shop. Edit the `settings.py` of the project and add the `LANGUAGES` setting to it. Place it next to the `LANGUAGE_CODE`. 
+- The setting contains two tuples that consist of a language code and a name. Language codes can be locale-specific, such as `en-us` or `en-gb`, or generic, such as `en`. With this setting, you specify that your application will only be available in English or Spanish. If yoy don't define a custom `Languages` setting, the site will be available in all the languages that Django is translated into. 
+- Add LocaleMiddelware to the middleware setting. It needs to use session data. 
+- Create a directory structure inside the main project directory, next to the manage.py file.
+- The locale directory is the place where message files for your application will reside. 
+- The locale_paths setting specifies the directory where Django has to look for translation files. Locale paths that appear first have the highest precedence.
+- When you use the makemessages command from your project directory, message files will be generated in the locale/ path you created. However, for applications that contain a locale/ directory, message files will be generated in that directory. 
+
+
 #### Translating Python Code
+
+- To translate literals in Python, mark strings for translation using the gettext() function included in django.utils.translation. The function translates the messages and returns a string. 
+- Convention is to import this function as a shorter alias named_ (underscore character).
+
+##### Standard translation
+
+- Mark a string for translation
+
+```python
+from django.utils.translation import gettext as _ 
+output = _('Text to be translated.')
+
+```
+##### Lazy translations
+
+- Django includes lazy versions for all of its translation functions with the suffix _lazy(). 
+- When using the lazy functions, strings are translated when the value is accessed, rather than when the function is called
+- The lazy translation functions come in handy when strings marked for translation are in paths that are executed when modules are loaded
+
+##### Translations including Variables
+
+- The strings marked for translation can include placeholders to include variables in the translations. The following code is an example of a translation string with a place holder:
+
+```python
+from django.utils.translation import gettext as _
+month = _('April')
+day = '14'
+output = _('Today is %(month)s %(day)s') % {'month': month, 'day': day}
+
+```
+- 
+-By using placeholders, you can reorder the text variables, i.e. 
+    - English: today is April 14
+    - Spanish: hoy es 14 de Abril
+- always use string interpolation instead of positional interpolation when you have more than one parameter for the translation string. This way, you will be able to reorder the placeholder text.
+
+##### Plural forms in translations
+
+- for plural forms, you can use the ngettext() and ngettext_lazy() functions as they translate singular and plural forms depending on an argument that indicates the number of objects
+
+##### Translating your own code
+
+- Edit the `settings.py` file of your project, import the gettext_lazy() function, and change the `language` setting 
+- Open the shell and run `django-admin makemessages --all` which will cause `processing locale es` and `processing locale en`
+- In the locale/ directory there should be two *.po files
+- Each translation string is preceded by a comment showing details about the file and the line where it was found. Each translation includes two strings: 
+    - msgid: The translation string as it appears in the source code.
+    - msgstr: The language translation, which is empty by default. This is where you have to enter the actual translation for the given string.
+    
+- Fill the msgstr translations for the given msgid string
+- Save the modified message file, open the shell, and run the `django-admin compilemessages` command which will create two *.mo files
+- Now the language names are translated, next is the field names on a site. Mark the fields with the _ indicator
+- create a locale directory in the application to generate separate translation files for each application; add the django.po file in the order application using a text editor and insert the translations, then save the file.
+- Also Poedit can be used to edit translations. You can download Poedit from https://poedit.net/.
+
+- Translating a form works through importing the gettext_lazy as _ import
+- and then by marking e.g. _('Quantity') as well
+
 #### Translating Templates
+- To use the hereafter tags you need to {% load i18n %} at the top of the template
+ 
+##### The {% trans %} template tag
+
+- This allows to mark a literal for translation. Internally, Django executes the gettext() on the given text:  `{% trans "Text to be translated" %}`
+- You can use `as` to store the translated content in a variable that you can use throughout your template:    `{% trans "Hello!" as greeting %}
+   <h1>{{ greeting }}</h1>` 
+
+##### The {% blocktrans %} template tag
+
+- This tag allows to mark content that includes literals and variable content using placeholders. The following example shows you how to use the tag, including a name variable in the content for translation: `   {% blocktrans %}Hello {{ name }}!{% endblocktrans %}`
+- You can use `with` to include template expressions, such as accessing object attributes or applying template filters to variables. Always use placeholders for these. You can't access expressions or object attributes inside the blocktrans block.
+
+##### Translating the shop templates
+
+- Edit the `shop/base.html` template by integrating the tag {% load i18n %} at the top and e.g. {% trans "My Shop" %} wherever you want to make a translation. Don't split any template tag across multiple lines.
+- You changed it and now you use {% blocktrans with ... %} to set up the placeholder total with the value of cart.get_total_price (the object method called here). You also use count, which allows you to set a variable for counting objects for Django to select the right plural form. You set the items variable to count objects with the value of total_items. This allows you to set a translation for the singular and plural forms, which you separate with the {% plural %} tag within the {% blocktrans %} block
+- Next edit the `shop/product/detail.html` template of the shop application
+- After editing all the files (e.g. list.html, created.html, and detail.html), update the message files to include the new translation strings via `django-admin makemessages --all`
+- The .po files are inside the locale directory of the myshop project; next run `django-admin compilemessages` to compile the translations.
+
 #### Using the Rosetta Translation Interface
+
+- Rosetta is a third-party application that allows you to edit translations using the same interface as the Django admin site. Rosetta makes it easy to edit .po files and it updates compiled translation files.
+- Add Rosetta to the `INSTALLED_APPS` setting in the settings.py.
+- Add Rosetta's URL to your main URL configuration. Edit the main urls.py file of your project and add the URL pattern to it. Place it before the shop.urls.
+- Navigate to to http://127.0.0.1:8000/rosetta/ after having signed in as a superuser. 
+- In the filter select THIRD PARTY to display all available message files, including those that belong to the orders application.
+- Click the Myshop link under the Spanish section to edit the Spanish translation. 
+- You can enter translations under the SPANISH column. Translations that include placeholders will also appear.
+- Rosetta uses different background colors to display placeholders. When you translate content, make sure that you keep placeholders untranslated. 
+- When translations are finished click "Save and translate next block". With this procedure the `compilemessages` command is not needed to be run. 
+- If you want other users to be able to edit translations, open http://127.0.0.1:8000/admin/auth/group/add/ in your browser and create
+a new group named translators. Then, access http://127.0.0.1:8000/admin/ auth/user/ to edit the users to whom you want to grant permissions so that they can edit translations. When editing a user, under the Permissions section, add the translators group to the Chosen Groups for each user. Rosetta is only available to superusers or users who belong to the translators group.
+
 #### Fuzzy Translations
+
+- FUZZY column in Rosetta is to mark translations that need to be reviewed by a translator.
+- When .po files are updated wit new translation strings, it is possible that some strings are automatically flagged as fuzzy. 
+- This happens when gettext() finds some msgid that has been slightly modified. 
+
 #### URL patterns for Internationalization
+
+- Django offers interantionalization capability for URLs. It includes two main features:
+    - Language prefix in URL patterns: adding a language prefix to URLs to serve each language version under a different base URL.
+    - Translated URL patterns: Translating URL patterns so that every URL is different for each language.
+- A reason for translating URLs is to optimize the site for search engines. By adding a language prefix, you will be able to index a URL for each language instead of a single URL for all of them. Also, URLs will rank better for each language.
+
+##### Adding a language prefix to URL patterns
+
+- To use languages in URL patterns, you have to use the LocaleMiddleware provided by Django. 
+- The framework will use it to identify the current language from the requested URL. 
+- You added it previously to the MIDDLEWARE setting of your project, so you don't need to do it now.
+- Edit the  main `urls.py` file of the myshop project and add i18n_patterns()
+- Combine non-translatable standard URL patterns and patterns under i18n_pattenrs so taht some patterns include a language prefix and others don't
+- However, it's better to use translated URLs only to avoid the possibility that a carelessly translated URL matches a non-translated URL pattern
+
+##### Translate URL patterns
+
+- Django supports translated strings in URL patterns.
+- You can use a different translation for each language for a single URL pattern. 
+- You can mark URL patterns for translation in the same way as you would with literals, using the gettext_ lazy() function.
+- Edit the main `urls.py` file of the myshop project and add translation strings to the regular expression of the URL patterns for the cart, orders, payment, and coupons application, add `from django.utils.translation import gettext_lazy as _
+`
+- Update the message files with `django-admin makemessages --all` 
+- Go to the spanish section via `http://127.0.0.1:8000/en/ rosetta/` to translate the URLs.
+
 #### Allowing Users to Switch Language
+
+- Allow your users to switch the language. Hence, add a language selector to the site. It wil consist of a list of available languages displayed using links. 
+- Therefore, change the base.html of the shop application. Functions as:
+    - Load internationalization tags using {% load i18n %}
+    - Use the {% get_current_language %} tag to retrieve the current language
+    - Get the languages defined in the LANGUAGES setting using the {% get_available_languages %} template tag
+    - Use the tag {% get_language_info_list %} to provide easy access to the language attributes
+    - Build an HTML list to display all available languages and you add a selected class attribute to the current active language
+
 #### Translating Models with django-parler
+
+- Django does not provide a solution for translating models 
+- A third-party applications is django-parler it offers a very effective way to translate models and it integrates smoothly with Django's administration site
+- django-parler generates a separate database table for each model that contains translations. This table includes all the translated fields and a foreign key for the original object that the translation belongs to. It also contains a language field, since each row stores the content for a single language
+
+##### Installing django-parler
+
+- run pip3 install django-parler.
+- Edit the settings.py and add 'parler' to the `INSTALLED_APPS` setting to define the available languages.
+
+##### Translating model fields
+
+- django-parler provides a TranslatableModel model class and a TranslatedFields wrapper to translate model fields. 
+- Edit the models.py file inside the shop application directory and add the related import
+- then modify the Category model to make them translatable; the model now inherits from the TranslatableModel instead of models. Model and both the name and slug fields are included in the TranslatedFields wrapper.
+- django-parler manages translations by generating another model for each translatable model.
+- The ProductTranslation model generated by django-parler includes the name, slug, and description translatable fileds, a language_code field and a ForeignKey for the master Product object. There is a one-to-many relationship from Product to ProductTranslation. 
+- A ProductTranslation object will exist for each available language of each Product object. 
+- Since Django uses a separate table for translations, there are some Django features that you can't use.
+- It is not possible to use a default ordering by a translated field. You can filter by translated fields in queries, but you can't include a translatable field in the ordering Meta options. Edit the models.py file of the shop application and comment out the ordering attribute of the Category Meta class.
+- You also have to comment out the ordering and index_together attributes of the Product Metaclass. The current version of django-parler does not provide support to validate index_together. Comment out the Product Metaclass.
+- 
+##### Integrating translations into the Admin site
+
+- django-parler integrates smoothly with the Django admin site. It includes a TranslatableAdmin class that overrides the ModelAdmin class provided by Django to manage model translations. 
+- Edit the admin.py of the shop application, and the classes CategoryAdmin and ProductAdmin
+- You have adapted the administration site to work with the new translated models. You can now sync the database with the model changes that you made.
+
+##### Creating migrations for model translations
+
+- Open the shell and run the command to create a new migration: 'python manage.py makemigrations shop --name "translations"'
+- This migration automatically includes the CategoryTranslation and ProductTranslation models created dynamically by django-parler
+- It's important to note that this migration deletes the previous existing fields from your models. This means that you will lose that data and will need to set your categories and products again in the administration site after running it.
+- Integrate a fix, and then migrate the database. 
+- Run the server and open http://127.0.0.1:8000/en/admin/shop/category/; check: that you have two columns for the categories now.
+
+##### Adapting views for translations
+
+- let's take a look at how you can retrieve and query translation fields. To get the object with translatable fields translated in a specific language, you can use Django's activate() function
+- Another way to do this is by using the language() manager provided by django- parler
+- When you access translated fields, they are resolved using the current language. You can set a different current language for an object to access that specific translation.
+- When performing a QuerySet using filter(), you can filter using the related translation objects with the translations__ syntax.
+- Let's adapt the product catalog views. Edit the views.py file of the shop application and, in the product_list view & edit the product_detail view.
+- The product_list and product_detail views are now adapted to retrieve objects using translated fields.
+- URL for a product in Spanish is http://127.0.0.1:8000/es/2/te-rojo/, whereas in English, the URL is http://127.0.0.1:8000/en/2/red-tea/
+- You have learned how to translate Python code, templates, URL patterns, and model fields. To complete the internationalization and localization process, you need to use localized formatting for dates, times, and numbers as well
+
 #### Format Localization
+
+- Depending on the user's locale, you might want to display dates, times, and numbers in different formats.
+- Localized formatting can be activated by changing the USE_L10N setting to True in the settings.py file of your project
+- Django will try to use a locale-specific format whenever it outputs a value in a template. You can see that decimal numbers in the English version of your site are displayed with a dot separator for decimal places, while
+in the Spanish version, they are displayed using a comma. This is due to the locale formats specified for the es locale by Django.
+- Django offers a {% localize %} template tag that allows you to turn on/off localization for template fragments. This gives you control over localized formatting. You will have to load the l10n tags to be able to use this template tag
+- Django also offers the localize and unlocalize template filters to force or avoid the localization of a value
+
 #### Using django-localflavor to validate form fields
 
+- django-localflavor is a third-party module that contains a collection of utils, such as form fields or model fields, that are specific for each country
+- It's very useful for validating local regions, local phone numbers, identity card numbers, social security numbers, and so on
+- Install django_localflavor by `pip install django-localflavor==3.0.1`
+- Register it in the `settings.py`
+- Add the United States zip code field so that a valid US zip code is required to create a new order
+- Edit the forms.py file of the orders application and import the USZipCodeField() from the us package of localflavor
+- The local components provided by localflavor are very useful for adapting your application to specific countries
+
 ### Building a Recommendation Engine
+
+- A recommendation engine is a system that predicts the preference or rating that a user would give to an item. The system selects relevant items for a user based on their behavior and the knowledge it has about them. Nowadays, recommendation systems are used in many online services. They help users by selecting the stuff they might be interested in form the vast amount of avialable data that is irrelevant to them. 
+- Offering good recommendations enhances user engagement. E-commerce sites also benefit from offerin relevant product recommendations by increasing their average revenue per user. 
+- You will suggest products based on historical sales, thus identifying products that are usually bought together. You are going to suggest complementary products in two different scenarios:
+    - Product detail page: display a list of products that are usually bought with the given product. This will be displayed as users who bought this also bought X, Y, Z. You need a data structure that allows you to store the number of items that each product has been bought toegther with the product being displayed.
+    - Cart detail page: Based on the rpdocuts users add to the cart, you are going to suggest products that are usually bought together with these ones. In this case, the score you calculate to obtain related products has to be aggregated.
+- Redis will store products that are purchased together.
+
 #### Recommending Products based on Previous Purchases
 
+- recommend products to users based on what they have adeded to the cart. Therefore, store a key in Redis for each product bought on your site. The product key will contain a Redis sorted set with scores. 
+- You will increment the score by 1 for each product bought together every time a new purchase is completed. The sorted set will allow you to five scores to products that are bought together.
+- Install the `redis-py` in your environment using `pip install redis==3.4.1`
+- Edit the settings.py and add the Redis settings to it (HOST, PORT, DB). 
+- These are the required settings to establish a connection with the Redis server. Create a new file inside the shop application directory and name it `recommender.py` 
+    - the Recommender class willl allow you to store product purchases and retrieve product suggestions for a given product or products
+    - the get_product_key() method receives an ID of a Product object and builds the Redis key for the sorted set where related products are stored, which looks like product:[id]:purchased_with
+    - the product_bought() method receives a list of Product objects that have been bought together (belong ot the same order)
+        - get the product ID of the given Products objects
+        - iterate over the produc IDs. For each ID, iterate again over the product IDs and skip the same product so that you get the products that are bought togehter.
+        - get the Redis product key for each product bought using the get_product_id() method. 
+        - Increment the score of each product ID contained in the sorted set by 1. The score represents the times another product has been bought together with the given product. 
+- You know have a method to store and score the products that were bought together. Next, write a method to retrieve the products that were bought together for a given list of products. It is named: suggest_products_for():
+    - parameters:
+        - products: is a list of Product objects to get recommendations for. It can contain one or more products.
+        - max_results: This is an integer that represents the max number of recommendations to return. 
+    - functionality:
+        - get the productID for the given Product object
+        - if only one product is given, retrieve the ID of the products that were bought together with the given product, ordered by the total number of times that they were bought together with ZRANGE command of Redis. Limit the number of results to the number specified in the max_results attribute. 
+        - If more than one product is given, you generate a temporary Redis key built with the IDs of the products.
+        - Combine and sum all scores for the items, contained in the sorted set of each of the given products. Done with Redis ZUNIONSTORE. This command performs a union of the sorted sets with the given keys, and stores the aggregated sum of scores of the elements ina  new Redis key. Save the scores in the temp key. 
+        - Since you aggregate scores, obtain the same products you are getting recommendationsfor. Remove them from the generated sorted set using ZREM. 
+        - Retrieve the IDs of the products from the temporary key, ordered by their score using the ZRANGE command. Limit the number of results to the number specified in the max_results attribute. Then, remove the temp key.
+        - get the Product objects with the given IDs and order the products in the same order as them.
+- Add a function to clear the recommendations clear_purchases().
+- Try it by running the redis server via src/redis-server
+- Run `python manage.py shell`: Make sure that you have at least four different products in your database. Retrieve four different products by their names
+- Add some test purchases to the engine; to have scored some scores.
+- Actiavet a language to retrieve translated products and get product recommendations to buy together with a given single product.
+- You can see that the order for recommended products is based on their score. Let's get recommendations for multiple products with aggregated scores
+- You can see that the order of the suggested products matches the aggregated scores
+- You have verified that your recommendation algorithm works as expected
+- Edit the views.py file of the shop application to integrate the engine into the system & add the functionality to retrieve a maximum of four recommended products in the product_detail vie
+- Edit the shop/product/detail.html template of the shop application and add the following code after {{ product.description|linebreaks }}
+- You are also going to include product recommendations in the cart. The recommendations will be based on the products that the user has added to the cart.
+- Edit views.py inside the cart application, import the Recommender class, and edit the cart_detail view
+- Edit the cart/detail.html template of the cart application
+
 ### Summary
+
+- You created a coupon system using sessions
+- learnt internationalization & localization
+- installed Rosetta in your project
+- translated URL patterns and you created a language selector to allow users to switch the language of the site
+- django-parler to translate models and you used django-localflavor to validate localized form fields
+- finally you built a recommendation engine
