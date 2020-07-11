@@ -1,6 +1,6 @@
-# 2020-Django 3 by Example - Chapter 7-9
+# 2020-Django 3 by Example - Chapter 10-13: E-Learning Platform
 
-## Running the Online Shop
+## Infrastructure E-Learning Platform
 
 ### Setting up the virtual environment
 mkdir env
@@ -17,7 +17,6 @@ pip3 install pyOpenSSL==19.0.0;
 pip3 install easy-thumbnails==2.7;
 pip3 install --upgrade certifi;
 pip3 install redis==3.4.1;
-
 
 ### Sync Database with the models 
 python3 manage.py makemigrations account
@@ -36,59 +35,94 @@ thisisunsafe
 https://127.0.0.1:8000/images/create/?title=test&url=https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Georgios_Jakobides_Girl_reading_c1882.jpg/800px-Georgios_Jakobides_Girl_reading_c1882.jpg
 
 
-## Chapter 7: Building an Online Shop
+## Chapter 10: Building an E-Learning Platform
 
-### Creating an Online Shop Project
+### Setting up the e-learning project
+### Building the course models
+#### Registering the models in the administration site
+#### Using fixtures to provide initial data for models
+### Creating models for diverse content
+#### Using model inheritance
+##### Abstract models
+##### Multi-table model inheritance
+##### Proxy models
+#### Creating the content models
+#### Creating custom model fields
+#### Adding ordering to the model
+### Creating a CMS
+#### Adding an auth system
+#### Creating the auth templates
+#### Creating class-based views
+#### Using mixins for class-based views
+#### Working with groups and permissions
+##### Restricting access to class-bassed views
+### Managing course modules and their content
+#### Using formsets for course modules
+#### Adding content to course modules
+#### Managing modules and their contents
+#### Reordering models and their contents
+##### Using mixins from django-braces
+### Summary
+## Chapter 11: Rendering and Caching Content
 
-#### Creating product catalog models
-#### Registering catalog models on the administration site
-#### Building catalog views
-#### Creating catalog templates
+### Displaying courses
+### Adding student registration
+#### Creating a student registration view
+#### Enrolling on courses
+### Accesing the course contents
+#### Rendering different types of content
 
-### Building a Shopping Cart
+### Using the cache framework
+#### Available cache backends
+#### Installing Memcached
+#### Cache setting
+#### Adding Memcache to your project
+##### Monitoring memcache
+#### Cache levels
+#### Using the low-level cache API 
+##### Cache based on dynamic data
+#### Caching template fragments
+#### Caching views
+##### Using per-site cache
 
-#### Using Django Sessions
-#### Session Settings
-#### Sessions Expiration
-#### Storing Shopping Carts in Sessions
-#### Creating Shopping Cart Views
-##### Adding items to the cart
-##### Building a template to display the cart
-##### Adding products to the cart
-##### Updating product quantities in the cart
+### Summary
 
-#### Creating a Context Processor for the Current Cart
-##### Contect processors
-##### Setting the cart into the request context
+## Chapter 12: Building a RESTful API
 
-### Registering Customer Orders
+### Installing Django REST framework
+### Defining serializers
+### Understanding parsers and renderers
+### Building list and detail views
+### Creating nested serializers
+### Building custom API views
+### Handling Auth
+### Adding permissions to views
+### Craeting viewsets and routers
+### Adding additional action to viewsets
+### Creating custom permissions
+### Serializing course contents
+### Consuming the REST API
+### Summary
 
-#### Creating order models
-#### Including order models in the administration site
-#### Creating customer orders
+## Chapter 13: Building a Chat Server
 
-### Launching Async Tasks with Celery 
-#### Installing Celery
-#### Installing RabbitMQ
-#### Adding Celery to your project
-#### Adding Async Tasks to your Application
-#### Monitoring Celery
+### Creating a chat application
+#### Implementing the chatroom view
+#### Deactivating per-site cache
+### Real-time Django with Channels
+#### Async Applications using ASGI
+#### The request/response cycle using Channels
+### Installing Channels
+### Writing a consumer
+### Routing
+### Implementing the websocket client
+### Enabling a channel layer
+#### Channels and Groups
+#### Setting up a channel layer with Redis
+#### Updating the consumer to broadcast messages
+#### Adding context to the messages
 
-## Chapter 8: Managing Payments and Orders
+### Modifying the consumer to be fully async
+### Integrating the chat with existing views
+### Summary
 
-### Integrating a Payment Gateway
-####
-####
-### Exporting Orders to CSV files
-### Registering Customer Orders
-### Extending the Administration Site with Custom Views
-### Generating PDF invoices dynamically
-
-## Chapter 9: Extending Your Shop
-
-### Creating a Coupon System
-
-####
-####
-### Adding Internationalization and Localization
-### Building a Recommendation Engine

@@ -15,19 +15,23 @@ brew install gettext
 brew link --force gettext
 
 ### Installing the modules
-### Chapter 7
+
 pip3 install Django;
 pip3 install Pillow==7.0.0;
 pip3 install celery==4.4.2;
 pip3 install flower==0.9.3;
-### Chapter 8
+
 pip3 install braintree==3.59.0;
-pip3 install WeasyPrint==51;
-### Chapter 9
+pip3 install WeasyPrint;
+
 pip3 install django-rosetta==0.9.3;
 pip3 install django-parler==2.0.1;
 pip3 install django-localflavor==3.0.1; 
 pip3 install redis==3.4.1;
+
+### Braintree API
+
+https://sandbox.braintreegateway.com/merchants/v8d2gtrj332vzc68/users/rbkzkpk23d7nn4rm/api_keys
 
 
 ### Sync Database with the models 
@@ -38,13 +42,14 @@ python3 manage.py migrate
 python3 manage.py createsuperuser
 
 ### Start the Server
-Shell 1: brew service start rabbitmq
+
+Shell 1: brew services start rabbitmq
 Shell 2: source env/myshop/bin/activate; celery -A myshop worker -l info
 Shell 3: source env/myshop/bin/activate; python3 manage.py runserver
-Stop Shell 1: brew service stop rabbitmq
+Stop Shell 1: brew services stop rabbitmq
 
-Shell 4: src/redis-server 
-Shell 5: python3 manage.py shell # with min 4 products in the database
+Shell 4: source env/myshop/bin/activate; src/redis-server 
+Shell 5: source env/myshop/bin/activate; python3 manage.py shell # with min 4 products in the database
 
 ### Use the STATIC_ROOT setting
 python3 manage.py collectstatic
