@@ -18,16 +18,6 @@ pip3 install channels==2.4.0;
 pip3 install redis==3.4.1;
 pip3 install channels-redis==2.4.2;
 
-<!--
-pip3 install social-auth-app-django==3.1.0;
-pip3 install django-extensions==2.2.5; 
-pip3 install werkzeug==0.16.0; 
-pip3 install pyOpenSSL==19.0.0;
-pip3 install easy-thumbnails==2.7;
-pip3 install --upgrade certifi;
-pip3 install redis==3.4.1;
--->
-
 ### Sync Database with the models 
 python3 manage.py makemigrations account
 python3 manage.py migrate (account)
