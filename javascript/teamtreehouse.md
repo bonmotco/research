@@ -235,7 +235,52 @@ Removing Nodes
     - var firstListItem = document.getElementById('first');
     - myList.removeChild(firstListItem)
 
-##
+## Responding to User Interaction
+What is an event?
+Mouse
+- Click
+- Scroll
+- dblclick
+- Mousedown
+- Mouseup
+- Mousemove
+- Mouseover
+- Mouseout
+Touch
+Keyboard
+
+Functions as Parameters
+- Functions are first class citizens meaning they can be used everywhere. He integrates functions into arguments and sets and example with timeout, e.g.
+
+Delaying Execution with setTimeout()
+- Window.setTimeout((something) => { console.log(something);} , 3000, ‘Greetings everyone!’ } );
+
+Listening for Events with addEventListener()
+- Event handlers are being explained, and functions are in other functions
+- First select all listItems at the top of the page with the querySelector via const listItems = document.getElementByTagName(‘li’)
+- Then you add an event via: listItems.addEventListener(‘mouseover’, () => {str = str.Upper()}
+- You’d create a second handler for ‘mouse out’!
+- Loop through all list items by surrounding the code in a for-loop.
+- An example:
+    - var warning = document.getElementById("warning");
+    - var button = document.getElementById('makeItRed');
+    - button.addEventListener('click',  () => {
+    -   warning.style.background = 'red'
+    - });
+- The new element doesn’t have the behaviour anymore! 
+
+Event Bubbling and Delegation
+- Every click etc. to an element gets send up to the parent, their parent etc.
+- They rise up the DOM tree like bubbles :)
+- Hence, set an eventListener always on the ancestor! Yet make sure it is in the direct line, but as close as possible. Div that contains the list is the best: listDiv
+- Yet we need an event object to understand WHICH object is being handled
+
+The Event Object
+- With the event object handler you can get events that are happening printed out. 
+- As an example you can print out every object by clicking on it with; all elements clicked will be logged to the console
+    - document.addEventListener(‘click’, (event) => { console.log(event.target); }});
+- Select the event.target.textContent and act on it with event.target.textContext.toUpperCase();
+- To listen for the event, add event as an argument and make sure it is only running on the list item via: If (event.target.tagName == ‘LI’) {} >>> the element has to be allCaps
 
 
 
