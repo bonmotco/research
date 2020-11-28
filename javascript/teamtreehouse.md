@@ -282,6 +282,51 @@ The Event Object
 - Select the event.target.textContent and act on it with event.target.textContext.toUpperCase();
 - To listen for the event, add event as an argument and make sure it is only running on the list item via: If (event.target.tagName == ‘LI’) {} >>> the element has to be allCaps
 
-
-
 ## 
+
+Traversing the DOM
+
+Using parentNode to Traverse Up the DOM
+- To delete a child you need to figure out who the parent is
+- It works by getting the parent via:
+    - Let paragraph = document.getElementById(‘myParagraph’)
+    - Let parent = paragraph.parentNode; //gets you the parent of the child
+    - Parent.removeChild(paragraph);
+- Example: 
+    - listDiv.addEventListener(‘click’, (event) => { if (event.target.tagName == ‘LI’) {let li = event.target; let ul = li.parentNode; ul.removeChild(li); } }
+- Always you have to have a constant and a handler in the JS file
+- Second example: 
+    - var removeMe = document.querySelector('.remove_me');
+    - var parent = removeMe.parentNode;
+    - parent.removeChild(removeMe)
+
+Using previousElementSibling and insertBefore
+- Do not use li.previousSibling to get the previous list element; it does return also elements that are not part of the DOM, since you have to call it twice >> use previousElementSibling instead.
+- You use the following to move up an item. Last line makes sure that you are only moving up if it is not the first item already in a list 
+    - let prevListItem = li.previousElementSibling;
+    - let  ul = li.parentNode;
+    - If (prevListItem) { ul.insertBefore(li, prevLi); }
+- To move an element down a list use nextElementSibling.
+- Another example:
+    - var list = document.getElementsByTagName('ul')[0];
+    - list.addEventListener('click', function(e) {
+    -   if (e.target.tagName == 'BUTTON') {
+    -     let p = e.target.previousSibling;
+    -     p.className = 'highlight';
+    -   }
+    - });
+
+Getting All Children of a Node with children
+- The first constants are called the: element selections
+- Do not have the buttons in the HTML at all, but write them only in JS
+- Strategy: write a function attachListItemButtons(li) {
+    - Let up = document.createElement(‘button’);
+    - up.className = ‘up’;
+    - up.textContent = ‘up’;
+    - li.appendChild(up); // down, remove
+- The initial list items do not come with buttons; therefore we have to append them to the existing list with attachLiustItemButtons()
+
+Getting the First and Last Child
+- Const firstListItem = listUl.firstElementChild;
+- Const lastListItem = listUl.lastElementChild;
+- Then attach color to them with: firstListItem .style.backgroundColor = ‘lightskyblue’;
