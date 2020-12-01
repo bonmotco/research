@@ -1,0 +1,86 @@
+# AJAX Basics
+
+## AJAX Concepts
+
+Introduction to AJAX
+
+- AJAX web pages ask for info from the server: Async JavaScript and XML
+- JS processes the data to change the web page
+- Request: Asking server for data
+- Response: Answer by server with data
+- In console you can see the ajax requests: control click and choose: 'Log XMLHttpRequests' that tell you the logging of your scrolling/page
+- Don't waste users time with unnecessary web page refreshes
+
+How AJAX works
+
+- Server signup example
+- XMLHttpRequest Object is being sent back and for
+- what AJAX stands for: Async JavaScript And XML
+- Four steps to creating and sending a XHR request:
+    - Create and XMLHTTP Request (XHR) Object: tells browser to get ready, get everything together to create the object to send and receive later
+    - Create a callback function: Programming to run when server returns its response, update the HTML on the page (update the map on google maps)
+    - Open a request: Give browser (method: get or post), url where method is sent to.
+    - Send the request: send from browser to webserver
+
+A Simple AJAX example
+
+__Step 1: Create the XHR object__
+
+var xhr = new XMLHttpRequest();
+
+- 
+- 
+- 
+- 
+- 
+- 
+
+
+GET and POST
+
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+
+
+AJAX Response Formats
+
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+
+
+AJAX Security Limitations
+
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+
+
+## Programming AJAX
+
+Introduction to the Project
+
+AJAX Callbacks
+
+Introducing JSON
+
+Parsing JSON Data
+
+Processing JSON Data
+
+Programming AJAX Challenge
+
+Programming AJAX Solution

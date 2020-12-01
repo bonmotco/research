@@ -282,9 +282,7 @@ The Event Object
 - Select the event.target.textContent and act on it with event.target.textContext.toUpperCase();
 - To listen for the event, add event as an argument and make sure it is only running on the list item via: If (event.target.tagName == ‘LI’) {} >>> the element has to be allCaps
 
-## 
-
-Traversing the DOM
+## 2Traversing the DOM
 
 Using parentNode to Traverse Up the DOM
 - To delete a child you need to figure out who the parent is
