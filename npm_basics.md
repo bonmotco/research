@@ -48,3 +48,7 @@ npm uninstall colors --save (will remove it permanently,and also from the packag
 global ones are uninstalled like this: 
 
 npm uninstall http-server -g
+
+## Check for outdated packages with:
+
+npm outdated 
