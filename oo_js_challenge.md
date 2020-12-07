@@ -1,1 +1,0 @@
-# Object-Oriented JavaScript Challenge
