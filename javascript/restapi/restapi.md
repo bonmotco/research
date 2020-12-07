@@ -105,3 +105,64 @@ app.post('/quotes', async (req, res) =>{
     res.json(quote);
 });
 </script>
+
+# Catching Errors / Minding HTTP Status Quotes
+
+Use try/catch and if sentences with statusQuotes to return. Example:
+
+<script>
+// Send a GET request to /quotes/:id to READ(view) a quote
+router.get('/quotes/:id', asyncHandler(async (req, res)=>{
+    const quote = await records.getQuote(req.params.id);
+
+    if(quote){
+        res.json(quote);
+    } else {
+        res.status(404).json({message: "Quote not found."}); // status is easily added
+    }
+}));
+</script>
+
+# Updating a Quote
+
+
+
+<script>
+// Send a PUT request to /quotes/:id to UPDATE (edit) a quote
+router.put('/quotes/:id', asyncHandler(async(req,res) => {
+    const quote = await records.getQuote(req.params.id);
+    if(quote){
+        quote.quote = req.body.quote;
+        quote.author = req.body.author;
+
+        await records.updateQuote(quote);
+        res.status(204).end();
+    } else {
+        res.status(404).json({message: "Quote Not Found"});
+    }
+}));
+</script>
+
+Use this in Postman via: ''; selecting PUT.
+.end() is needed with PUT request.
+
+# Deleting a Record
+
+<script>
+// Send a DELETE request to /quotes/:id DELETE a quote 
+router.delete("/quotes/:id", asyncHandler(async(req,res, next) => {
+    const quote = await records.getQuote(req.params.id);
+    await records.deleteQuote(quote);
+    res.status(204).end();
+}));
+</script>
+
+# Use Express Middleware to Clean the Code and Avoid DRY
+
+## Write a Global Error Handler
+
+## Refactor with Express Middleware
+
+## Structuring the REST API
+
+## Get a Random Quote
