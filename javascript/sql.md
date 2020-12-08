@@ -36,3 +36,35 @@ SELECT name AS Name, description AS Description, price AS "Current Price" FROM p
 SELECT name Name, description Description, price "Current Price" FROM products;
 
 ### Link: https://github.com/treehouse/cheatsheets/blob/master/sql_basics/cheatsheet.md
+
+## Searching Tables with 'WHERE'
+
+SQL Used
+A WHERE Clause
+SELECT <columns> FROM <table> WHERE <condition>;
+Equality Operator
+Find all rows that a given value matches a column's value.
+
+SELECT <columns> FROM <table> WHERE <column name> = <value>;
+Examples:
+
+SELECT * FROM contacts WHERE first_name = "Andrew";
+SELECT first_name, email FROM users WHERE last_name = "Chalkley";
+SELECT name AS "Product Name" FROM products WHERE stock_count = 0;
+SELECT title "Book Title" FROM books WHERE year_published = 1999;
+Inequality Operator
+Find all rows that a given value doesn't match a column's value.
+
+SELECT <columns> FROM <table> WHERE <column name> != <value>;
+SELECT <columns> FROM <table> WHERE <column name> <> <value>;
+The not equal to or inequality operator can be written in two ways != and <>. The latter is less common.
+
+Examples:
+
+SELECT * FROM contacts WHERE first_name != "Kenneth";
+SELECT first_name, email FROM users WHERE last_name != "L:one";
+SELECT name AS "Product Name" FROM products WHERE stock_count != 0;
+SELECT title "Book Title" FROM books WHERE year_published != 2015;
+
+
+
